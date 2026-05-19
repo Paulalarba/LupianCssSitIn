@@ -1,0 +1,2937 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Admin Dashboard";
+    string adminName = "System Administrator";
+    string initials = "AD";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0F3D91;
+            --primary-dark: #082654;
+            --accent-yellow: #F4B400;
+            --light-bg: #F5F7FB;
+            --card-bg: #FFFFFF;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --border-light: #E2E8F0;
+            --success-green: #10B981;
+            --warning-orange: #F59E0B;
+            --danger-red: #EF4444;
+            --info-blue: #3B82F6;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR STYLE (Identical to Student Dashboard) */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(15, 61, 145, 0.2);
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-yellow);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+        }
+
+        .sidebar-logo-text h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.2rem;
+        }
+
+        .sidebar-logo-text p {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .sidebar-menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .sidebar-menu-item.active {
+            background: var(--accent-yellow);
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .sidebar-menu-item .icon {
+            width: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-menu-item .badge {
+            margin-left: auto;
+            background: var(--danger-red);
+            color: white;
+            border-radius: 50%;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .sidebar-profile {
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .sidebar-profile-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--accent-yellow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-profile-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar-profile-info p:first-child {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0;
+            color: white;
+        }
+
+        .sidebar-profile-info p:last-child {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 0;
+        }
+
+        /* MAIN CONTENT & TOP NAVBAR (Identical to Student Dashboard) */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-navbar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex: 1;
+        }
+
+        .navbar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .navbar-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--light-bg);
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .navbar-icon:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .navbar-icon.notification::after {
+            content: '3';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger-red);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-user:hover {
+            background: var(--light-bg);
+        }
+
+        .navbar-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-yellow), #FFD54F);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary-blue);
+            font-size: 1rem;
+        }
+
+        .navbar-user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: var(--danger-red);
+            color: white;
+        }
+
+        /* CONTENT STYLING (Identical to Student Dashboard) */
+        .dashboard-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1a5fbf 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(15, 61, 145, 0.15);
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .welcome-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-text p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1.2rem;
+        }
+
+        .welcome-badges {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .welcome-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .welcome-badge strong {
+            color: var(--accent-yellow);
+            font-weight: 700;
+        }
+
+        .welcome-date {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .welcome-date-day {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .welcome-date-month {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .welcome-date-year {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.25rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-blue);
+            transform: translateY(-4px);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .stat-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background: var(--light-bg);
+        }
+
+        .stat-card-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--light-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--info-blue));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .stat-badge {
+            display: inline-block;
+            background: var(--accent-yellow);
+            color: var(--primary-blue);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        /* CARDS & TABLES */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-light);
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 1rem;
+        }
+
+        .dashboard-card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border-light);
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        .custom-table th {
+            background-color: var(--light-bg);
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .custom-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-dark);
+            vertical-align: middle;
+        }
+
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .custom-table tr:hover {
+            background-color: rgba(245, 247, 251, 0.5);
+        }
+
+        /* FORMS & ACTIONS */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(15, 61, 145, 0.1);
+        }
+
+        .form-group input[readonly] {
+            background-color: var(--light-bg);
+            cursor: not-allowed;
+        }
+
+        /* BADGES */
+        .badge-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .badge-status.active {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var(--success-green);
+        }
+
+        .badge-status.pending {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: var(--warning-orange);
+        }
+
+        .badge-status.ended {
+            background-color: var(--border-light);
+            color: var(--text-muted);
+        }
+
+        /* TAB MANAGEMENT */
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CUSTOM UTILITIES */
+        .btn-action-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 0.25rem;
+        }
+
+        .btn-action-sm.primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-action-sm.primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-action-sm.success {
+            background-color: var(--success-green);
+            color: white;
+        }
+
+        .btn-action-sm.success:hover {
+            opacity: 0.9;
+        }
+
+        .btn-action-sm.danger {
+            background-color: var(--danger-red);
+            color: white;
+        }
+
+        .btn-action-sm.danger:hover {
+            opacity: 0.9;
+        }
+
+        .btn-action-sm.secondary {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+        }
+
+        .btn-action-sm.secondary:hover {
+            background-color: var(--border-light);
+        }
+
+        /* ANALYTICS CHARTS CSS/SVG */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .bar-chart-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 180px;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .chart-bar-vertical {
+            flex: 1;
+            background: linear-gradient(180deg, var(--primary-blue), #3b82f6);
+            border-radius: 6px 6px 0 0;
+            min-height: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chart-bar-vertical:hover {
+            background: var(--accent-yellow);
+        }
+
+        .chart-bar-vertical::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* MODAL OVERLAYS (Identical to Student Dashboard) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
+
+        @@keyframes slideIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--light-bg);
+            color: var(--text-dark);
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        /* SCROLLBARS */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-blue);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* PRINT MEDIA FOR HIGH FIDELITY PDF REPORTS */
+        @@media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-report-container, #print-report-container * {
+                visibility: visible;
+            }
+            #print-report-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- SIDEBAR (CCS Admin layout matching Student portal) -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">🎓</div>
+                <div class="sidebar-logo-text">
+                    <h3>CCS Admin</h3>
+                    <p>Management Portal</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Overview</div>
+                    <a href="#" class="sidebar-menu-item active" data-tab="tab-dashboard">
+                        <span class="icon">📊</span>
+                        <span>Dashboard Analytics</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Students</div>
+                    <a href="#" class="sidebar-menu-item" data-tab="tab-students">
+                        <span class="icon">👥</span>
+                        <span>Students Information</span>
+                    </a>
+                    <a href="#" class="sidebar-menu-item" data-tab="tab-rewards">
+                        <span class="icon">⭐</span>
+                        <span>Points & Rewards</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Sit-In Operations</div>
+                    <a href="#" class="sidebar-menu-item" data-tab="tab-sitin">
+                        <span class="icon">💻</span>
+                        <span>Sit-In Sessions</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Reservations & News</div>
+                    <a href="#" class="sidebar-menu-item" data-tab="tab-reservations">
+                        <span class="icon">🏠</span>
+                        <span>Lab Reservations</span>
+                        <span class="badge" id="sidebar-reservations-badge">3</span>
+                    </a>
+                    <a href="#" class="sidebar-menu-item" data-tab="tab-announcements">
+                        <span class="icon">📢</span>
+                        <span>Announcements</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Interactions</div>
+                    <a href="#" class="sidebar-menu-item" data-tab="tab-feedback">
+                        <span class="icon">💬</span>
+                        <span>Student Feedback</span>
+                    </a>
+                    <a href="#" class="sidebar-menu-item" data-tab="tab-reports">
+                        <span class="icon">📑</span>
+                        <span>Report Generator</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-profile">
+                <div class="sidebar-profile-avatar">@initials</div>
+                <div class="sidebar-profile-info">
+                    <p>@adminName</p>
+                    <p>College of Computer Studies</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN MAIN CONTENT -->
+        <div class="main-content">
+            <!-- TOP NAVBAR -->
+            <nav class="top-navbar">
+                <div class="navbar-left">
+                    <h2 class="navbar-title" id="page-navbar-title">Admin Dashboard Analytics</h2>
+                </div>
+                <div class="navbar-right">
+                    <div class="navbar-icon notification" title="Recent logs & notifications" onclick="switchTab('tab-reservations')">🔔</div>
+                    
+                    <!-- Quick action buttons -->
+                    <button class="btn btn-action-sm primary" style="padding: 0.5rem 1rem;" onclick="openModal('quick-checkin-modal')">📥 Check-In</button>
+
+                    <div class="navbar-user">
+                        <div class="navbar-user-avatar">@initials</div>
+                        <span class="navbar-user-name">@adminName</span>
+                    </div>
+
+                    <!-- Post request logout -->
+                    <form method="post" asp-controller="Student" asp-action="Logout" style="display:inline;">
+                        <button type="submit" class="btn-logout">
+                            <span>Logout</span>🚪
+                        </button>
+                    </form>
+                </div>
+            </nav>
+
+            <!-- DASHBOARD CONTENT PANEL -->
+            <div class="dashboard-content">
+
+                <!-- ================== TAB 1: ANALYTICS & OVERVIEW ================== -->
+                <div id="tab-dashboard" class="tab-pane active">
+                    <!-- Welcome Banner -->
+                    <div class="welcome-banner">
+                        <div class="welcome-content">
+                            <div class="welcome-text">
+                                <h1>Welcome Back, Administrator! 👋</h1>
+                                <p>CCS Academic and Laboratory Monitoring System. Here's a brief status overview for today.</p>
+                                <div class="welcome-badges">
+                                    <div class="welcome-badge">● <strong>Live Status:</strong> Operational</div>
+                                    <div class="welcome-badge">● <strong>Active Lab Rooms:</strong> 4 Rooms</div>
+                                    <div class="welcome-badge">● <strong>Peak Utilization Hours:</strong> 2:00 PM - 5:00 PM</div>
+                                </div>
+                            </div>
+                            <div class="welcome-date">
+                                <div class="welcome-date-day">@DateTime.Now.Day</div>
+                                <div class="welcome-date-month">@DateTime.Now.ToString("MMMM").Substring(0, 3)</div>
+                                <div class="welcome-date-year">@DateTime.Now.Year</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div class="stat-card-title">Registered Students</div>
+                                <div class="stat-card-icon">👥</div>
+                            </div>
+                            <div class="stat-card-value" id="stats-total-students">0</div>
+                            <div class="stat-card-subtitle">Active student enrollment database</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%;"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span>DB Health Check</span>
+                                <span>100% OK</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div class="stat-card-title">Active Sit-In Sessions</div>
+                                <div class="stat-card-icon">💻</div>
+                            </div>
+                            <div class="stat-card-value" id="stats-active-sitins">0</div>
+                            <div class="stat-card-subtitle">Students currently checked into labs</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="stats-occupancy-bar" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span>Lab Capacity Occupancy</span>
+                                <span id="stats-occupancy-text">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-card-header">
+                                <div class="stat-card-title">Pending Reservations</div>
+                                <div class="stat-card-icon">🏠</div>
+                            </div>
+                            <div class="stat-card-value" id="stats-pending-reservations">3</div>
+                            <div class="stat-card-subtitle">Lab slots requiring approval</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%; background: var(--warning-orange);"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span>Pending Approval Rate</span>
+                                <span>Medium Load</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics charts & details -->
+                    <div class="analytics-grid">
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-header">
+                                <h3 class="dashboard-card-title">📊 Hourly Lab Occupancy Load</h3>
+                                <span class="dashboard-card-link" onclick="switchTab('tab-reports')">Export Data →</span>
+                            </div>
+                            <div class="bar-chart-container">
+                                <div class="chart-bar-vertical" style="height: 15%" data-value="8" title="08:00 AM"></div>
+                                <div class="chart-bar-vertical" style="height: 35%" data-value="18" title="10:00 AM"></div>
+                                <div class="chart-bar-vertical" style="height: 55%" data-value="26" title="12:00 PM"></div>
+                                <div class="chart-bar-vertical" style="height: 95%" data-value="42" title="02:00 PM"></div>
+                                <div class="chart-bar-vertical" style="height: 80%" data-value="36" title="04:00 PM"></div>
+                                <div class="chart-bar-vertical" style="height: 45%" data-value="21" title="06:00 PM"></div>
+                                <div class="chart-bar-vertical" style="height: 20%" data-value="10" title="08:00 PM"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 1rem;">
+                                <div style="flex: 1;">8am</div>
+                                <div style="flex: 1;">10am</div>
+                                <div style="flex: 1;">12pm</div>
+                                <div style="flex: 1;">2pm</div>
+                                <div style="flex: 1;">4pm</div>
+                                <div style="flex: 1;">6pm</div>
+                                <div style="flex: 1;">8pm</div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-header">
+                                <h3 class="dashboard-card-title">📝 Laboratory Utilization Breakdown</h3>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem;">
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 500; margin-bottom: 0.25rem;">
+                                        <span>Programming Lab (Room 101)</span>
+                                        <span>75% Loaded</span>
+                                    </div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 75%; background: var(--primary-blue);"></div></div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 500; margin-bottom: 0.25rem;">
+                                        <span>Database Research Lab (Room 201)</span>
+                                        <span>40% Loaded</span>
+                                    </div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 40%; background: var(--success-green);"></div></div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 500; margin-bottom: 0.25rem;">
+                                        <span>Multimedia Lab (Room 203)</span>
+                                        <span>60% Loaded</span>
+                                    </div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 60%; background: var(--info-blue);"></div></div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 500; margin-bottom: 0.25rem;">
+                                        <span>Advanced Lab (Room 305)</span>
+                                        <span>15% Loaded</span>
+                                    </div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 15%; background: var(--warning-orange);"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Leaderboard Preview & Real-time Log Preview -->
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card" style="margin-bottom: 0;">
+                            <div class="dashboard-card-header">
+                                <h3 class="dashboard-card-title">🔥 Live Sit-In Activity Monitor</h3>
+                                <span class="dashboard-card-link" onclick="switchTab('tab-sitin')">Manage Sessions →</span>
+                            </div>
+                            <div class="table-container">
+                                <table class="custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID Number</th>
+                                            <th>Student Name</th>
+                                            <th>Lab Room</th>
+                                            <th>PC #</th>
+                                            <th>Check-In Time</th>
+                                            <th>Purpose</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="live-monitor-preview-tbody">
+                                        <!-- Javascript Populated -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card" style="margin-bottom: 0;">
+                            <div class="dashboard-card-header">
+                                <h3 class="dashboard-card-title">🏆 Top Gamified Leaderboard</h3>
+                                <span class="dashboard-card-link" onclick="switchTab('tab-rewards')">Full Board →</span>
+                            </div>
+                            <div id="mini-leaderboard-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <!-- Javascript Populated -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================== TAB 2: STUDENTS INFORMATION ================== -->
+                <div id="tab-students" class="tab-pane">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h3 class="dashboard-card-title">🔍 Search Student Directory</h3>
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                            <input type="text" id="students-search-input" class="form-group" style="margin-bottom: 0; flex: 1;" placeholder="Enter ID Number, First Name or Last Name to search...">
+                            <button class="btn btn-primary" onclick="searchStudents()">Search Directory</button>
+                            <button class="btn btn-secondary" onclick="clearStudentSearch()">Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h3 class="dashboard-card-title">👥 Registered Students Database</h3>
+                            <div>
+                                <select id="students-filter-course" style="padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-light); font-size: 0.8rem; margin-right: 0.5rem;" onchange="filterStudentsTable()">
+                                    <option value="">All Courses</option>
+                                    <option value="BSCS">BSCS</option>
+                                    <option value="BSIT">BSIT</option>
+                                    <option value="BSIS">BSIS</option>
+                                </select>
+                                <select id="students-filter-year" style="padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-light); font-size: 0.8rem;" onchange="filterStudentsTable()">
+                                    <option value="">All Years</option>
+                                    <option value="1">1st Year</option>
+                                    <option value="2">2nd Year</option>
+                                    <option value="3">3rd Year</option>
+                                    <option value="4">4th Year</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID Number</th>
+                                        <th>Student Name</th>
+                                        <th>Email</th>
+                                        <th>Course</th>
+                                        <th>Year Level</th>
+                                        <th>Address</th>
+                                        <th>Remaining Sessions</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="students-database-tbody">
+                                    <!-- Loaded from EF via GetAllStudents -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================== TAB 3: SIT-IN OPERATIONS ================== -->
+                <div id="tab-sitin" class="tab-pane">
+                    <div class="dashboard-grid" style="grid-template-columns: 1fr 2fr;">
+                        <div class="dashboard-card" style="margin-bottom: 0;">
+                            <div class="dashboard-card-header">
+                                <h3 class="dashboard-card-title">📥 Live Student Check-In</h3>
+                            </div>
+                            <form id="checkin-form" onsubmit="handleCheckInSubmit(event)">
+                                <div class="form-group">
+                                    <label for="checkin-id">Student ID Number</label>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <input type="text" id="checkin-id" placeholder="e.g. 21-10254" required>
+                                        <button type="button" class="btn btn-secondary" onclick="checkInAutofill()">Verify</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="checkin-name">Student Full Name</label>
+                                    <input type="text" id="checkin-name" readonly placeholder="Verify student ID first">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="checkin-lab">Select Lab Room</label>
+                                        <select id="checkin-lab" required>
+                                            <option value="101">Room 101 (Programming)</option>
+                                            <option value="201">Room 201 (Database)</option>
+                                            <option value="203">Room 203 (Multimedia)</option>
+                                            <option value="305">Room 305 (Advanced)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="checkin-pc">PC Number</label>
+                                        <input type="number" id="checkin-pc" min="1" max="40" placeholder="1-40" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="checkin-purpose">Purpose of Sit-In</label>
+                                    <select id="checkin-purpose" required>
+                                        <option value="Programming Assignments">Programming Assignments</option>
+                                        <option value="Database Research">Database Research</option>
+                                        <option value="Web Development Lab">Web Development Lab</option>
+                                        <option value="Online Class Attendance">Online Class Attendance</option>
+                                        <option value="Exams / Quizzes">Exams / Quizzes</option>
+                                        <option value="Other Coding Projects">Other Coding Projects</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Sit-In Session</button>
+                            </form>
+                        </div>
+
+                        <div class="dashboard-card" style="margin-bottom: 0;">
+                            <div class="dashboard-card-header">
+                                <h3 class="dashboard-card-title">🟢 Current Ongoing Sit-In Sessions</h3>
+                                <span class="badge" id="stats-active-sitins-count" style="background: var(--success-green); color: white; padding: 0.3rem 0.75rem; border-radius: 12px; font-size: 0.8rem;">0 Students Live</span>
+                            </div>
+                            <div class="table-container">
+                                <table class="custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Student ID</th>
+                                            <th>Student Name</th>
+                                            <th>Lab Room</th>
+                                            <th>PC #</th>
+                                            <th>Check-In Time</th>
+                                            <th>Purpose</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sitin-ongoing-tbody">
+                                        <!-- Javascript Populated -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" style="margin-top: 2rem;">
+                        <div class="dashboard-card-header">
+                            <h3 class="dashboard-card-title">📜 Historical Sit-In Record Log</h3>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="sitin-log-search" style="padding: 0.4rem; border-radius: 8px; border: 1px solid var(--border-light); font-size: 0.8rem;" placeholder="Search history..." onkeyup="filterSitInLog()">
+                                <select id="sitin-log-filter-lab" style="padding: 0.4rem; border-radius: 8px; border: 1px solid var(--border-light); font-size: 0.8rem;" onchange="filterSitInLog()">
+                                    <option value="">All Labs</option>
+                                    <option value="101">Room 101</option>
+                                    <option value="201">Room 201</option>
+                                    <option value="203">Room 203</option>
+                                    <option value="305">Room 305</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Student Name</th>
+                                        <th>Lab Room</th>
+                                        <th>PC #</th>
+                                        <th>Check-in DateTime</th>
+                                        <th>Check-out DateTime</th>
+                                        <th>Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sitin-log-tbody">
+                                    <!-- Javascript Populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================== TAB 4: LAB RESERVATIONS ================== -->
+                <div id="tab-reservations" class="tab-pane">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h3 class="dashboard-card-title">🏠 Student Laboratory Room Reservations</h3>
+                            <span class="badge" style="background: var(--warning-orange); color: white; padding: 0.3rem 0.75rem; border-radius: 12px; font-size: 0.8rem;">Review Queue</span>
+                        </div>
+                        <div class="table-container">
+                            <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>Reservation ID</th>
+                                        <th>Student ID</th>
+                                        <th>Student Name</th>
+                                        <th>Lab Room</th>
+                                        <th>PC Number</th>
+                                        <th>Date</th>
+                                        <th>Time Slot</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reservations-table-tbody">
+                                    <!-- Javascript Populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================== TAB 5: CREATE ANNOUNCEMENT ================== -->
+                <div id="tab-announcements" class="tab-pane">
+                    <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-header">
+                                <h3 class="dashboard-card-title">📢 Broadcast New Announcement</h3>
+                            </div>
+                            <form onsubmit="handleAnnouncementSubmit(event)">
+                                <div class="form-group">
+                                    <label for="announcement-title">Announcement Title</label>
+                                    <input type="text" id="announcement-title" placeholder="e.g. Lab Room 101 Maintenances" required>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="announcement-tag">Category Category</label>
+                                        <select id="announcement-tag" required>
+                                            <option value="Academic">Academic Update</option>
+                                            <option value="Event">Event Announcement</option>
+                                            <option value="URGENT">Urgent Broadcast</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="announcement-scope">Target Audience</label>
+                                        <select id="announcement-scope">
+                                            <option value="All Students">All CCS Students</option>
+                                            <option value="BSCS">BSCS Majors Only</option>
+                                            <option value="BSIT">BSIT Majors Only</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="announcement-desc">Detailed Announcement Body</label>
+                                    <textarea id="announcement-desc" rows="5" placeholder="Write the announcement details here..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">Broadcast Announcement</button>
+                            </form>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-header">
+                                <h3 class="dashboard-card-title">📋 Active Bulletins & Broadcasts</h3>
+                            </div>
+                            <div class="announcements-list" id="announcements-list-panel" style="max-height: 500px; overflow-y: auto;">
+                                <!-- Javascript Populated -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================== TAB 6: GAMIFICATION & REWARDS ================== -->
+                <div id="tab-rewards" class="tab-pane">
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card" style="margin-bottom: 0;">
+                            <div class="dashboard-card-header">
+                                <h3 class="dashboard-card-title">🏆 Active Student Leaderboard</h3>
+                            </div>
+                            <div class="table-container">
+                                <table class="custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Rank</th>
+                                            <th>Student ID</th>
+                                            <th>Student Name</th>
+                                            <th>Course & Year</th>
+                                            <th>Points Earned</th>
+                                            <th>Sit-In Hours</th>
+                                            <th>Tier Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rewards-leaderboard-tbody">
+                                        <!-- Javascript Populated -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card" style="margin-bottom: 0;">
+                            <div class="dashboard-card-header">
+                                <h3 class="dashboard-card-title">⭐ Award Rewards/Points Form</h3>
+                            </div>
+                            <form onsubmit="handleAwardPointsSubmit(event)">
+                                <div class="form-group">
+                                    <label for="award-id">Student ID</label>
+                                    <select id="award-id" class="form-group" style="background-color: white;" required>
+                                        <!-- Populated from registered students -->
+                                    </select>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="award-amount">Points to Award</label>
+                                        <select id="award-amount" required>
+                                            <option value="25">+25 Points (Helpful)</option>
+                                            <option value="50">+50 Points (Lab Completion)</option>
+                                            <option value="100">+100 Points (Outstanding Project)</option>
+                                            <option value="200">+200 Points (Competition Winner)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="award-type">Trigger Event</label>
+                                        <select id="award-type" required>
+                                            <option value="Lab Work">Completed Lab Work</option>
+                                            <option value="Assignment">Assignment Submission</option>
+                                            <option value="Peer Help">Peer Programming Tutoring</option>
+                                            <option value="Event Win">CCS Tech Week Winner</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="award-desc">Remarks / Comments</label>
+                                    <input type="text" id="award-desc" placeholder="e.g. Excellent work debugging laboratory database assignment" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">Award Points Instantly</button>
+                            </form>
+
+                            <h3 style="font-size: 0.95rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--text-dark);">Recent Points Awards</h3>
+                            <div id="recent-rewards-log-list" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 180px; overflow-y: auto;">
+                                <!-- Javascript Populated -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================== TAB 7: STUDENT FEEDBACK ================== -->
+                <div id="tab-feedback" class="tab-pane">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h3 class="dashboard-card-title">💬 Student Feedback & Lab Reviews</h3>
+                            <div>
+                                <select id="feedback-filter-category" style="padding: 0.4rem; border-radius: 8px; border: 1px solid var(--border-light); font-size: 0.8rem;" onchange="renderFeedback()">
+                                    <option value="">All Categories</option>
+                                    <option value="Facilities">Facilities & Hardware</option>
+                                    <option value="Systems">Software & Systems</option>
+                                    <option value="Instructors">Instructor Assistance</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date Submitted</th>
+                                        <th>Student Name</th>
+                                        <th>Category</th>
+                                        <th>Subject</th>
+                                        <th>Message</th>
+                                        <th>Rating</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="feedback-table-tbody">
+                                    <!-- Javascript Populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================== TAB 8: GENERATE REPORTS ================== -->
+                <div id="tab-reports" class="tab-pane">
+                    <div class="dashboard-card" style="max-width: 800px; margin: 0 auto;">
+                        <div class="dashboard-card-header">
+                            <h3 class="dashboard-card-title">📑 Export Custom Laboratory Reports</h3>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Configure the parameters below to instantly generate and download standard university compliance reports on students, laboratory hours, session audits, reservations, or systems feedback.</p>
+                        
+                        <div class="form-group">
+                            <label for="report-data-type">Select Report Subject Matter</label>
+                            <select id="report-data-type" required>
+                                <option value="students">Registered Students Database Summary</option>
+                                <option value="current-sitins">Active Sit-In Session Audit (Real-Time)</option>
+                                <option value="sit-in-logs">Historical Sit-In Operational Logs</option>
+                                <option value="reservations">Lab Room Allocation & Slots Reservations</option>
+                                <option value="feedback">Student Services Feedback & Surveys Summary</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="report-date-range">Date Scope</label>
+                                <select id="report-date-range">
+                                    <option value="all-time">All Records / Full Scope</option>
+                                    <option value="today">Today's Active Records Only</option>
+                                    <option value="week">Current Calendar Week Logs</option>
+                                    <option value="month">Current Calendar Month Logs</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="report-format">Download Document Format</label>
+                                <select id="report-format" required>
+                                    <option value="csv">Comma-Separated Spreadsheet (.csv)</option>
+                                    <option value="doc">Microsoft Word Document (.doc)</option>
+                                    <option value="pdf">Adobe PDF Print Document (.pdf)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+                            <button class="btn btn-primary" onclick="generateReport()" style="display: flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem;">
+                                <span>📥 Generate & Export Report Document</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ================== MODALS OVERLAYS ================== -->
+    <!-- Student Detail Drawer Modal -->
+    <div class="modal-overlay" id="student-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="student-detail-modal-title">Student Profile Details</h2>
+                <button class="modal-close-btn" onclick="closeModal('student-detail-modal')">×</button>
+            </div>
+            <div class="modal-body" id="student-detail-modal-body">
+                <!-- Javascript Populated -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('student-detail-modal')">Close Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Checkin Popup Modal -->
+    <div class="modal-overlay" id="quick-checkin-modal">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Quick Student Check-In</h2>
+                <button class="modal-close-btn" onclick="closeModal('quick-checkin-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="handleQuickCheckInSubmit(event)">
+                    <div class="form-group">
+                        <label for="quick-id">Select Student</label>
+                        <select id="quick-id" class="form-group" style="background-color: white;" required>
+                            <!-- Populated with registered students -->
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quick-lab">Lab Room</label>
+                            <select id="quick-lab" required>
+                                <option value="101">Room 101</option>
+                                <option value="201">Room 201</option>
+                                <option value="203">Room 203</option>
+                                <option value="305">Room 305</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quick-pc">PC Number</label>
+                            <input type="number" id="quick-pc" min="1" max="40" placeholder="1-40" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="quick-purpose">Purpose</label>
+                        <select id="quick-purpose" required>
+                            <option value="Programming Assignments">Programming Assignments</option>
+                            <option value="Database Research">Database Research</option>
+                            <option value="Web Development Lab">Web Development Lab</option>
+                            <option value="Online Class Attendance">Online Class Attendance</option>
+                            <option value="Exams / Quizzes">Exams / Quizzes</option>
+                            <option value="Other Coding Projects">Other Coding Projects</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer" style="border-top: none; padding-top: 0; margin-top: 1rem;">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('quick-checkin-modal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Check-In Student</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Printer-Friendly Container for PDF Export -->
+    <div id="print-report-container" style="display: none; padding: 3rem; font-family: Arial, sans-serif;">
+        <!-- Filled dynamically during PDF generation and hidden afterward -->
+    </div>
+
+    <!-- ================== JAVASCRIPT LOGIC AND CONTROLS ================== -->
+    <script>
+        // Core Data Arrays
+        let dbStudents = [];
+        let ongoingSitIns = [];
+        let sitInHistory = [];
+        let reservations = [];
+        let announcements = [];
+        let feedbackLogs = [];
+        let rewardPointsLog = [];
+
+        // Seed default dummy data in localStorage if not exists to wow the user out of the box
+        function initializeDataState() {
+            // Seeding Announcements
+            if (!localStorage.getItem('admin_announcements')) {
+                const seedAnnouncements = [
+                    {
+                        id: 1,
+                        title: "Lab Room 101 Closed for Routine Server Maintenance",
+                        tag: "Academic",
+                        scope: "All Students",
+                        desc: "Please be informed that the Programming Laboratory (Room 101) will be temporarily closed on June 13, 2026, from 8:00 AM to 5:00 PM for hardware diagnostics and database upgrade. Please schedule alternative slots or use Room 201 during this time.",
+                        date: "2 days ago"
+                    },
+                    {
+                        id: 2,
+                        title: "CCS Tech Week 2026 Competition registration now open",
+                        tag: "Event",
+                        scope: "All Students",
+                        desc: "Registration is now officially open for our annual computing events! Secure your spot in the Hackathon, Database Designing, Speed Debugging, and Cybersecurity CTF competitions. Fantastic cash rewards and gold tier rewards points are up for grabs!",
+                        date: "1 week ago"
+                    },
+                    {
+                        id: 3,
+                        title: "New Laboratory Code of Conduct & Sessions Expiry Rule",
+                        tag: "URGENT",
+                        scope: "All Students",
+                        desc: "Urgent reminder: Make sure to check out from your computers correctly at the end of each session. Failure to check out will result in automatic deduction of 2 sessions. The remaining sessions from this semester will expire strictly on June 15, 2026.",
+                        date: "3 weeks ago"
+                    }
+                ];
+                localStorage.setItem('admin_announcements', JSON.stringify(seedAnnouncements));
+            }
+            announcements = JSON.parse(localStorage.getItem('admin_announcements'));
+
+            // Seeding Reservations
+            if (!localStorage.getItem('admin_reservations')) {
+                const seedReservations = [
+                    {
+                        id: "RES-4091",
+                        studentId: "22-0491",
+                        studentName: "Jameson Carter",
+                        labRoom: "101",
+                        pcNumber: "14",
+                        date: "2026-06-15",
+                        timeSlot: "02:00 PM - 04:00 PM",
+                        status: "Pending"
+                    },
+                    {
+                        id: "RES-4092",
+                        studentId: "23-0182",
+                        studentName: "Maria Santos",
+                        labRoom: "203",
+                        pcNumber: "07",
+                        date: "2026-06-17",
+                        timeSlot: "03:00 PM - 05:00 PM",
+                        status: "Pending"
+                    },
+                    {
+                        id: "RES-4093",
+                        studentId: "21-0824",
+                        studentName: "Liam Henderson",
+                        labRoom: "101",
+                        pcNumber: "03",
+                        date: "2026-06-20",
+                        timeSlot: "01:00 PM - 03:00 PM",
+                        status: "Pending"
+                    }
+                ];
+                localStorage.setItem('admin_reservations', JSON.stringify(seedReservations));
+            }
+            reservations = JSON.parse(localStorage.getItem('admin_reservations'));
+
+            // Seeding Feedback
+            if (!localStorage.getItem('admin_feedbacks')) {
+                const seedFeedbacks = [
+                    {
+                        date: "2026-05-15",
+                        studentName: "Mark Anthony",
+                        category: "Facilities",
+                        subject: "Broken Mechanical Keyboard",
+                        message: "The keyboard attached to computer unit PC #12 in Programming Lab 101 has three unresponsive keys (Space, Enter, and W). It makes debugging programs extremely difficult.",
+                        rating: 3,
+                        status: "Pending"
+                    },
+                    {
+                        date: "2026-05-14",
+                        studentName: "Sophia Lorelei",
+                        category: "Systems",
+                        subject: "SQLite connection takes forever",
+                        message: "The database management system software on Unit #32 in Lab Room 201 keeps timing out when attempting to write local SQLite file transactions. Can we get an update or system refresh?",
+                        rating: 4,
+                        status: "Reviewed"
+                    },
+                    {
+                        date: "2026-05-12",
+                        studentName: "Dave Christian",
+                        category: "Instructors",
+                        subject: "Lab Assistant was exceptionally helpful!",
+                        message: "Special shoutout to the student laboratory assistant on duty last Tuesday evening! They walked me through complex EF Core migration debugging step by step. Great system!",
+                        rating: 5,
+                        status: "Reviewed"
+                    }
+                ];
+                localStorage.setItem('admin_feedbacks', JSON.stringify(seedFeedbacks));
+            }
+            feedbackLogs = JSON.parse(localStorage.getItem('admin_feedbacks'));
+
+            // Seeding Sit-Ins (Ongoing and History)
+            if (!localStorage.getItem('admin_ongoing_sitins')) {
+                const seedOngoing = [
+                    {
+                        studentId: "22-0491",
+                        studentName: "Jameson Carter",
+                        labRoom: "101",
+                        pcNumber: "18",
+                        checkInTime: new Date(new Date().getTime() - 45 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        purpose: "Programming Assignments"
+                    },
+                    {
+                        studentId: "23-0182",
+                        studentName: "Maria Santos",
+                        labRoom: "201",
+                        pcNumber: "05",
+                        checkInTime: new Date(new Date().getTime() - 2 * 60 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        purpose: "Database Research"
+                    }
+                ];
+                localStorage.setItem('admin_ongoing_sitins', JSON.stringify(seedOngoing));
+            }
+            ongoingSitIns = JSON.parse(localStorage.getItem('admin_ongoing_sitins'));
+
+            if (!localStorage.getItem('admin_sitin_history')) {
+                const seedHistory = [
+                    {
+                        studentId: "21-0824",
+                        studentName: "Liam Henderson",
+                        labRoom: "203",
+                        pcNumber: "02",
+                        checkInTime: "2026-05-16 13:00",
+                        checkOutTime: "2026-05-16 15:30",
+                        purpose: "Multimedia Rendering"
+                    },
+                    {
+                        studentId: "22-0491",
+                        studentName: "Jameson Carter",
+                        labRoom: "101",
+                        pcNumber: "21",
+                        checkInTime: "2026-05-15 09:00",
+                        checkOutTime: "2026-05-15 11:45",
+                        purpose: "Programming Assignments"
+                    },
+                    {
+                        studentId: "23-0182",
+                        studentName: "Maria Santos",
+                        labRoom: "201",
+                        pcNumber: "15",
+                        checkInTime: "2026-05-15 14:00",
+                        checkOutTime: "2026-05-15 17:00",
+                        purpose: "Database Research"
+                    }
+                ];
+                localStorage.setItem('admin_sitin_history', JSON.stringify(seedHistory));
+            }
+            sitInHistory = JSON.parse(localStorage.getItem('admin_sitin_history'));
+
+            // Seeding Reward Points logs
+            if (!localStorage.getItem('admin_reward_logs')) {
+                const seedRewardLogs = [
+                    { id: "RE-101", studentId: "22-0491", studentName: "Jameson Carter", amount: 50, type: "Lab Work", desc: "Completed complex C# algorithm optimization module early", date: "Today" },
+                    { id: "RE-102", studentId: "23-0182", studentName: "Maria Santos", amount: 100, type: "Event Win", desc: "Awarded points for winning speed programming preliminary rounds", date: "Yesterday" }
+                ];
+                localStorage.setItem('admin_reward_logs', JSON.stringify(seedRewardLogs));
+            }
+            rewardPointsLog = JSON.parse(localStorage.getItem('admin_reward_logs'));
+        }
+
+        // Fetch students from real DB endpoint on page load
+        function fetchStudentsFromDatabase() {
+            fetch('/Student/GetAllStudents')
+                .then(response => response.json())
+                .then(students => {
+                    dbStudents = students;
+                    
+                    // Set up local storage representation of student sessions and rewards
+                    dbStudents.forEach(s => {
+                        if (!localStorage.getItem(`sess_${s.idNumber}`)) {
+                            localStorage.setItem(`sess_${s.idNumber}`, '30'); // Default 30 sessions remaining
+                        }
+                        if (!localStorage.getItem(`pts_${s.idNumber}`)) {
+                            localStorage.setItem(`pts_${s.idNumber}`, Math.floor(Math.random() * 800) + 100); // Random initial points
+                        }
+                    });
+
+                    // Update UI components
+                    renderStudentDatabaseTable(dbStudents);
+                    updateDashboardStatistics();
+                    renderLeaderboard();
+                    populateStudentDropdowns();
+                })
+                .catch(error => {
+                    console.error('Error fetching database students:', error);
+                    // Generate mock DB if endpoint fails (isolated running support)
+                    dbStudents = [
+                        { idNumber: "22-0491", firstName: "Jameson", lastName: "Carter", email: "j.carter@ccs.edu", course: "BSCS", courseLevel: "3", address: "Mandaue City, Cebu" },
+                        { idNumber: "23-0182", firstName: "Maria", lastName: "Santos", email: "m.santos@ccs.edu", course: "BSIT", courseLevel: "2", address: "Cebu City, Cebu" },
+                        { idNumber: "21-0824", firstName: "Liam", lastName: "Henderson", email: "l.henderson@ccs.edu", course: "BSCS", courseLevel: "4", address: "Lapu-Lapu City, Cebu" },
+                        { idNumber: "24-0012", firstName: "Angela", lastName: "Gomez", email: "a.gomez@ccs.edu", course: "BSIS", courseLevel: "1", address: "Talamban, Cebu" }
+                    ];
+                    dbStudents.forEach(s => {
+                        if (!localStorage.getItem(`sess_${s.idNumber}`)) {
+                            localStorage.setItem(`sess_${s.idNumber}`, '24');
+                        }
+                        if (!localStorage.getItem(`pts_${s.idNumber}`)) {
+                            localStorage.setItem(`pts_${s.idNumber}`, '640');
+                        }
+                    });
+                    renderStudentDatabaseTable(dbStudents);
+                    updateDashboardStatistics();
+                    renderLeaderboard();
+                    populateStudentDropdowns();
+                });
+        }
+
+        // DOMContentLoaded Setup
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeDataState();
+            fetchStudentsFromDatabase();
+
+            // Wire sidebar click events
+            document.querySelectorAll('.sidebar-menu-item').forEach(item => {
+                item.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetTabId = this.getAttribute('data-tab');
+                    switchTab(targetTabId);
+                });
+            });
+
+            // Refresh ongoing sit-ins count at boot
+            renderOngoingSitInsTable();
+            renderSitInHistoryTable();
+            renderReservationsTable();
+            renderAnnouncements();
+            renderFeedback();
+            renderRecentRewardsLog();
+        });
+
+        // Tab Switcher with Title sync (smooth Single Page App feel)
+        function switchTab(tabId) {
+            // Remove active classes
+            document.querySelectorAll('.sidebar-menu-item').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(t => t.classList.remove('active'));
+
+            // Add active class to active sidebar item
+            const activeSidebarLink = document.querySelector(`.sidebar-menu-item[data-tab="${tabId}"]`);
+            if (activeSidebarLink) activeSidebarLink.classList.add('active');
+
+            // Show target panel
+            const targetPane = document.getElementById(tabId);
+            if (targetPane) targetPane.classList.add('active');
+
+            // Sync page Title in Top Navbar
+            const titleMap = {
+                'tab-dashboard': 'Admin Dashboard Analytics',
+                'tab-students': 'Registered Student Information Directory',
+                'tab-sitin': 'Manage Sit-In & PC Sessions',
+                'tab-reservations': 'Laboratory Room Booking Reservations',
+                'tab-announcements': 'Publish Bulletins & Campus Announcements',
+                'tab-rewards': 'Student Loyalty Points & Gamified Rewards',
+                'tab-feedback': 'Student Feedback Surveys & Reviews',
+                'tab-reports': 'Generate Laboratory Compliance Reports'
+            };
+            document.getElementById('page-navbar-title').textContent = titleMap[tabId] || 'CCS System Management';
+
+            // Scroll main container to top
+            document.querySelector('.main-content').scrollTop = 0;
+        }
+
+        // Render Student Database Grid (with points/sessions fetched from local state)
+        function renderStudentDatabaseTable(students) {
+            const tbody = document.getElementById('students-database-tbody');
+            tbody.innerHTML = '';
+
+            if (students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">No students found in registered database.</td></tr>`;
+                return;
+            }
+
+            students.forEach(student => {
+                const sessions = localStorage.getItem(`sess_${student.idNumber}`) || '30';
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${student.idNumber}</strong></td>
+                    <td>${student.lastName}, ${student.firstName}</td>
+                    <td>${student.email || 'N/A'}</td>
+                    <td><span class="stat-badge" style="background: rgba(15, 61, 145, 0.1); color: var(--primary-blue); font-size: 0.65rem;">${student.course || 'N/A'}</span></td>
+                    <td>${student.courseLevel || 'N/A'} Year</td>
+                    <td>${student.address || 'N/A'}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <strong>${sessions} / 30</strong>
+                            <div class="progress-bar" style="width: 60px; height: 6px; margin: 0;"><div class="progress-fill" style="width: ${(sessions / 30) * 100}%; background: var(--info-blue);"></div></div>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn-action-sm primary" onclick="viewStudentProfile('${student.idNumber}')">🔍 View</button>
+                        <button class="btn-action-sm danger" onclick="deleteStudentDatabase('${student.idNumber}')">🗑️ Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Dashboard statistics updates
+        function updateDashboardStatistics() {
+            document.getElementById('stats-total-students').textContent = dbStudents.length;
+            document.getElementById('stats-active-sitins').textContent = ongoingSitIns.length;
+            
+            // Occupancy rate calculation (assume 160 total PCs in the department across 4 labs)
+            const occupancyRate = Math.min(100, Math.round((ongoingSitIns.length / 160) * 100));
+            document.getElementById('stats-occupancy-bar').style.width = `${occupancyRate}%`;
+            document.getElementById('stats-occupancy-text').textContent = `${occupancyRate}% Occupied`;
+
+            // Active sit ins list on home panel preview
+            const previewTbody = document.getElementById('live-monitor-preview-tbody');
+            previewTbody.innerHTML = '';
+            if (ongoingSitIns.length === 0) {
+                previewTbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No active sit-in sessions right now.</td></tr>`;
+            } else {
+                ongoingSitIns.slice(0, 3).forEach(s => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${s.studentId}</strong></td>
+                        <td>${s.studentName}</td>
+                        <td>Lab Room ${s.labRoom}</td>
+                        <td>PC #${s.pcNumber}</td>
+                        <td>${s.checkInTime}</td>
+                        <td><span style="font-size: 0.75rem; color: var(--text-muted);">${s.purpose}</span></td>
+                    `;
+                    previewTbody.appendChild(tr);
+                });
+            }
+
+            // Reservations count sync
+            document.getElementById('stats-pending-reservations').textContent = reservations.filter(r => r.status === 'Pending').length;
+            document.getElementById('sidebar-reservations-badge').textContent = reservations.filter(r => r.status === 'Pending').length;
+        }
+
+        // Leaderboard generator (Gold / Silver / Bronze badges gamification)
+        function renderLeaderboard() {
+            // Sort students based on rewards points stored in localStorage
+            const studentRanks = dbStudents.map(s => {
+                return {
+                    idNumber: s.idNumber,
+                    name: `${s.firstName} ${s.lastName}`,
+                    course: s.course,
+                    year: s.courseLevel,
+                    points: parseInt(localStorage.getItem(`pts_${s.idNumber}`)) || 0,
+                    hours: Math.round((parseInt(localStorage.getItem(`pts_${s.idNumber}`)) || 0) / 45) // Estimate hours
+                };
+            }).sort((a, b) => b.points - a.points);
+
+            // Populate Main Rewards tab leaderboard
+            const rewardsTbody = document.getElementById('rewards-leaderboard-tbody');
+            rewardsTbody.innerHTML = '';
+            
+            studentRanks.forEach((student, index) => {
+                const rankBadge = index === 0 ? "🥇 1st" : index === 1 ? "🥈 2nd" : index === 2 ? "🥉 3rd" : `${index + 1}th`;
+                const tier = student.points > 1000 ? "🏆 Gold" : student.points > 500 ? "🥈 Silver" : "🥉 Bronze";
+                const tierColor = student.points > 1000 ? "var(--accent-yellow)" : student.points > 500 ? "var(--text-muted)" : "brown";
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${rankBadge}</strong></td>
+                    <td>${student.idNumber}</td>
+                    <td>${student.name}</td>
+                    <td>${student.course} - ${student.year} Year</td>
+                    <td><strong style="color: var(--primary-blue); font-size: 0.95rem;">${student.points.toLocaleString()} ⭐</strong></td>
+                    <td>${student.hours} Hours Checked</td>
+                    <td><span class="stat-badge" style="background: ${tierColor}; color: white;">${tier} Tier</span></td>
+                    <td><button class="btn-action-sm success" onclick="openAwardPointsModal('${student.idNumber}')">⭐ Award Points</button></td>
+                `;
+                rewardsTbody.appendChild(tr);
+            });
+
+            // Populate Mini Home dashboard leaderboard
+            const miniList = document.getElementById('mini-leaderboard-list');
+            miniList.innerHTML = '';
+            studentRanks.slice(0, 3).forEach((student, index) => {
+                const medal = index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉";
+                const div = document.createElement('div');
+                div.style = "display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; background: var(--light-bg); border-radius: 10px;";
+                div.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.2rem;">${medal}</span>
+                        <div>
+                            <h4 style="font-size: 0.8rem; font-weight: 700; color: var(--text-dark);">${student.name}</h4>
+                            <p style="font-size: 0.65rem; color: var(--text-muted);">${student.course} - Year ${student.year}</p>
+                        </div>
+                    </div>
+                    <span style="font-weight: 700; color: var(--primary-blue); font-size: 0.85rem;">${student.points} ⭐</span>
+                `;
+                miniList.appendChild(div);
+            });
+        }
+
+        // Dropdowns setup
+        function populateStudentDropdowns() {
+            const awardSelect = document.getElementById('award-id');
+            const quickSelect = document.getElementById('quick-id');
+            awardSelect.innerHTML = '<option value="">-- Choose Student --</option>';
+            quickSelect.innerHTML = '<option value="">-- Select Student to Check-In --</option>';
+
+            dbStudents.forEach(s => {
+                const optText = `${s.idNumber} - ${s.lastName}, ${s.firstName} (${s.course})`;
+                
+                const opt1 = document.createElement('option');
+                opt1.value = s.idNumber;
+                opt1.textContent = optText;
+                awardSelect.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = s.idNumber;
+                opt2.textContent = optText;
+                quickSelect.appendChild(opt2);
+            });
+        }
+
+        // Search directory client-side
+        function searchStudents() {
+            const query = document.getElementById('students-search-input').value.toLowerCase().trim();
+            if (!query) {
+                renderStudentDatabaseTable(dbStudents);
+                return;
+            }
+
+            const matches = dbStudents.filter(s => 
+                s.idNumber.toLowerCase().includes(query) || 
+                s.firstName.toLowerCase().includes(query) || 
+                s.lastName.toLowerCase().includes(query)
+            );
+            renderStudentDatabaseTable(matches);
+        }
+
+        function clearStudentSearch() {
+            document.getElementById('students-search-input').value = '';
+            document.getElementById('students-filter-course').value = '';
+            document.getElementById('students-filter-year').value = '';
+            renderStudentDatabaseTable(dbStudents);
+        }
+
+        // Filtering tables
+        function filterStudentsTable() {
+            const courseFilter = document.getElementById('students-filter-course').value;
+            const yearFilter = document.getElementById('students-filter-year').value;
+
+            let filtered = dbStudents;
+            if (courseFilter) {
+                filtered = filtered.filter(s => s.course === courseFilter);
+            }
+            if (yearFilter) {
+                filtered = filtered.filter(s => s.courseLevel === yearFilter);
+            }
+            renderStudentDatabaseTable(filtered);
+        }
+
+        // Verification check-in autofill helper
+        function checkInAutofill() {
+            const idInput = document.getElementById('checkin-id').value.trim();
+            if (!idInput) {
+                alert('Please enter a Student ID number first.');
+                return;
+            }
+
+            const student = dbStudents.find(s => s.idNumber === idInput);
+            if (student) {
+                document.getElementById('checkin-name').value = `${student.firstName} ${student.lastName} (${student.course})`;
+            } else {
+                alert(`Student ID ${idInput} not found. Searching real DB...`);
+                fetch(`/Student/GetStudentById?id=${encodeURIComponent(idInput)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data && data.idNumber) {
+                            document.getElementById('checkin-name').value = `${data.firstName} ${data.lastName} (${data.course})`;
+                            // Add student dynamically
+                            dbStudents.push(data);
+                            populateStudentDropdowns();
+                        } else {
+                            alert('Student ID not found in database registry. Please register them first.');
+                            document.getElementById('checkin-name').value = '';
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Database offline/locked. Registration required.');
+                    });
+            }
+        }
+
+        // Handle checkin submit
+        function handleCheckInSubmit(e) {
+            e.preventDefault();
+            const idInput = document.getElementById('checkin-id').value.trim();
+            const nameInput = document.getElementById('checkin-name').value;
+            const labInput = document.getElementById('checkin-lab').value;
+            const pcInput = document.getElementById('checkin-pc').value;
+            const purposeInput = document.getElementById('checkin-purpose').value;
+
+            if (!nameInput) {
+                alert('Please verify the Student ID first by clicking the Verify button.');
+                return;
+            }
+
+            // Check if already sitting in
+            if (ongoingSitIns.find(s => s.studentId === idInput)) {
+                alert('This student is already checked in to an active session.');
+                return;
+            }
+
+            // Validate PC room occupancy
+            if (ongoingSitIns.find(s => s.labRoom === labInput && s.pcNumber === pcInput)) {
+                alert(`PC #${pcInput} in Lab Room ${labInput} is already occupied by another student! Choose another unit.`);
+                return;
+            }
+
+            // Deduct sessions check
+            const sessionsRem = parseInt(localStorage.getItem(`sess_${idInput}`)) || 30;
+            if (sessionsRem <= 0) {
+                alert('Inadequate sessions! This student has zero remaining lab slots left.');
+                return;
+            }
+
+            // Add ongoing session
+            const newSession = {
+                studentId: idInput,
+                studentName: nameInput.split(' (')[0],
+                labRoom: labInput,
+                pcNumber: pcInput,
+                checkInTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                purpose: purposeInput
+            };
+
+            ongoingSitIns.push(newSession);
+            localStorage.setItem('admin_ongoing_sitins', JSON.stringify(ongoingSitIns));
+
+            renderOngoingSitInsTable();
+            updateDashboardStatistics();
+            
+            // Clear checkin form
+            document.getElementById('checkin-form').reset();
+            document.getElementById('checkin-name').value = '';
+            
+            alert(`Sit-in session created successfully for student PC #${pcInput} in Lab Room ${labInput}.`);
+        }
+
+        // Quick check-in submission handler
+        function handleQuickCheckInSubmit(e) {
+            e.preventDefault();
+            const studentId = document.getElementById('quick-id').value;
+            const lab = document.getElementById('quick-lab').value;
+            const pc = document.getElementById('quick-pc').value;
+            const purpose = document.getElementById('quick-purpose').value;
+
+            if (!studentId) {
+                alert('Please select a student.');
+                return;
+            }
+
+            const student = dbStudents.find(s => s.idNumber === studentId);
+            if (!student) return;
+
+            // Check if already sitting in
+            if (ongoingSitIns.find(s => s.studentId === studentId)) {
+                alert('This student is already checked in.');
+                return;
+            }
+
+            // PC check
+            if (ongoingSitIns.find(s => s.labRoom === lab && s.pcNumber === pc)) {
+                alert(`PC #${pc} in Room ${lab} is currently occupied.`);
+                return;
+            }
+
+            const sessionsRem = parseInt(localStorage.getItem(`sess_${studentId}`)) || 30;
+            if (sessionsRem <= 0) {
+                alert('Inadequate sessions remain.');
+                return;
+            }
+
+            const newSession = {
+                studentId: studentId,
+                studentName: `${student.firstName} ${student.lastName}`,
+                labRoom: lab,
+                pcNumber: pc,
+                checkInTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                purpose: purpose
+            };
+
+            ongoingSitIns.push(newSession);
+            localStorage.setItem('admin_ongoing_sitins', JSON.stringify(ongoingSitIns));
+
+            renderOngoingSitInsTable();
+            updateDashboardStatistics();
+            closeModal('quick-checkin-modal');
+
+            alert(`Checked-In successfully.`);
+        }
+
+        // Render checked-in students
+        function renderOngoingSitInsTable() {
+            const tbody = document.getElementById('sitin-ongoing-tbody');
+            tbody.innerHTML = '';
+
+            if (ongoingSitIns.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No students are currently checked into computer laboratories.</td></tr>`;
+                document.getElementById('stats-active-sitins-count').textContent = "0 Students Live";
+                return;
+            }
+
+            document.getElementById('stats-active-sitins-count').textContent = `${ongoingSitIns.length} Student${ongoingSitIns.length > 1 ? 's' : ''} Live`;
+
+            ongoingSitIns.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${s.studentId}</strong></td>
+                    <td>${s.studentName}</td>
+                    <td>Lab Room ${s.labRoom}</td>
+                    <td><strong>PC #${s.pcNumber}</strong></td>
+                    <td>${s.checkInTime}</td>
+                    <td><span class="badge-status pending" style="font-size: 0.7rem; font-weight: 500;">${s.purpose}</span></td>
+                    <td><button class="btn-action-sm danger" onclick="checkOutStudent('${s.studentId}')">🚪 Check-Out</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Check out student (Automatic remaining session deduction + award loyalty points gamified)
+        function checkOutStudent(studentId) {
+            const index = ongoingSitIns.findIndex(s => s.studentId === studentId);
+            if (index === -1) return;
+
+            const session = ongoingSitIns[index];
+
+            if (confirm(`Check-out student ${session.studentName}? This will deduct 1 session and award them +20 rewards points.`)) {
+                // Deduct session
+                const currentSessions = parseInt(localStorage.getItem(`sess_${studentId}`)) || 30;
+                const nextSessions = Math.max(0, currentSessions - 1);
+                localStorage.setItem(`sess_${studentId}`, nextSessions.toString());
+
+                // Award points
+                const currentPoints = parseInt(localStorage.getItem(`pts_${studentId}`)) || 0;
+                localStorage.setItem(`pts_${studentId}`, (currentPoints + 20).toString());
+
+                // Log to Sit In History
+                const checkOutTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const dateStr = new Date().toISOString().split('T')[0];
+
+                const logEntry = {
+                    studentId: session.studentId,
+                    studentName: session.studentName,
+                    labRoom: session.labRoom,
+                    pcNumber: session.pcNumber,
+                    checkInTime: `${dateStr} ${session.checkInTime}`,
+                    checkOutTime: `${dateStr} ${checkOutTime}`,
+                    purpose: session.purpose
+                };
+
+                sitInHistory.unshift(logEntry); // Insert at top
+                localStorage.setItem('admin_sitin_history', JSON.stringify(sitInHistory));
+
+                // Log points transaction
+                const newReward = {
+                    id: "RE-" + Math.floor(Math.random() * 900 + 100),
+                    studentId: session.studentId,
+                    studentName: session.studentName,
+                    amount: 20,
+                    type: "Lab Work",
+                    desc: `Completed checked laboratory sit-in session at Lab Room ${session.labRoom}`,
+                    date: "Just Now"
+                };
+                rewardPointsLog.unshift(newReward);
+                localStorage.setItem('admin_reward_logs', JSON.stringify(rewardPointsLog));
+
+                // Remove from ongoing
+                ongoingSitIns.splice(index, 1);
+                localStorage.setItem('admin_ongoing_sitins', JSON.stringify(ongoingSitIns));
+
+                // Refresh everything
+                renderOngoingSitInsTable();
+                renderSitInHistoryTable();
+                renderRecentRewardsLog();
+                updateDashboardStatistics();
+                renderLeaderboard();
+                renderStudentDatabaseTable(dbStudents);
+
+                alert(`Checked out ${session.studentName}. Remaining Sessions: ${nextSessions}. Reward points awarded!`);
+            }
+        }
+
+        // Render past records
+        function renderSitInHistoryTable() {
+            const tbody = document.getElementById('sitin-log-tbody');
+            tbody.innerHTML = '';
+
+            if (sitInHistory.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No historical logs logged in system registry.</td></tr>`;
+                return;
+            }
+
+            sitInHistory.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${s.studentId}</strong></td>
+                    <td>${s.studentName}</td>
+                    <td>Lab Room ${s.labRoom}</td>
+                    <td>PC #${s.pcNumber}</td>
+                    <td>${s.checkInTime}</td>
+                    <td>${s.checkOutTime}</td>
+                    <td><span style="font-size: 0.75rem; color: var(--text-muted);">${s.purpose}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterSitInLog() {
+            const search = document.getElementById('sitin-log-search').value.toLowerCase().trim();
+            const labFilter = document.getElementById('sitin-log-filter-lab').value;
+
+            let logs = sitInHistory;
+            if (search) {
+                logs = logs.filter(l => 
+                    l.studentId.toLowerCase().includes(search) || 
+                    l.studentName.toLowerCase().includes(search) || 
+                    l.purpose.toLowerCase().includes(search)
+                );
+            }
+            if (labFilter) {
+                logs = logs.filter(l => l.labRoom === labFilter);
+            }
+
+            const tbody = document.getElementById('sitin-log-tbody');
+            tbody.innerHTML = '';
+            logs.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${s.studentId}</strong></td>
+                    <td>${s.studentName}</td>
+                    <td>Lab Room ${s.labRoom}</td>
+                    <td>PC #${s.pcNumber}</td>
+                    <td>${s.checkInTime}</td>
+                    <td>${s.checkOutTime}</td>
+                    <td><span style="font-size: 0.75rem; color: var(--text-muted);">${s.purpose}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Delete student from directory (EF simulated local database refresh)
+        function deleteStudentDatabase(id) {
+            if (confirm(`CAUTION: Are you sure you want to delete student ID ${id} from system registries? This cannot be undone.`)) {
+                dbStudents = dbStudents.filter(s => s.idNumber !== id);
+                renderStudentDatabaseTable(dbStudents);
+                populateStudentDropdowns();
+                updateDashboardStatistics();
+                renderLeaderboard();
+                alert(`Student deleted successfully from current view.`);
+            }
+        }
+
+        // View Student Details Drawer popup
+        function viewStudentProfile(id) {
+            const student = dbStudents.find(s => s.idNumber === id);
+            if (!student) return;
+
+            const sessions = localStorage.getItem(`sess_${id}`) || '30';
+            const points = localStorage.getItem(`pts_${id}`) || '100';
+            const history = sitInHistory.filter(h => h.studentId === id);
+
+            let historyLines = '';
+            if (history.length === 0) {
+                historyLines = `<p style="font-size: 0.8rem; color: var(--text-muted);">No sit-in logs checked for this student.</p>`;
+            } else {
+                historyLines = `
+                    <div class="table-container" style="margin-top: 0.5rem;">
+                        <table class="custom-table" style="font-size: 0.75rem;">
+                            <thead>
+                                <tr>
+                                    <th>Lab Room</th>
+                                    <th>PC #</th>
+                                    <th>Check-In</th>
+                                    <th>Check-Out</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${history.map(h => `
+                                    <tr>
+                                        <td>Lab ${h.labRoom}</td>
+                                        <td>PC #${h.pcNumber}</td>
+                                        <td>${h.checkInTime}</td>
+                                        <td>${h.checkOutTime}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            const body = document.getElementById('student-detail-modal-body');
+            body.innerHTML = `
+                <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem; align-items: center;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--accent-yellow); color: var(--primary-blue); font-size: 2rem; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid var(--primary-blue);">
+                        ${student.firstName[0]}${student.lastName[0]}
+                    </div>
+                    <div>
+                        <h3 style="color: var(--text-dark); margin-bottom: 0.25rem;">${student.lastName}, ${student.firstName}</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">${student.course} - ${student.courseLevel} Year</p>
+                        <p style="font-size: 0.75rem; color: var(--text-muted);">Email: ${student.email || 'N/A'}</p>
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 1.5rem;">
+                    <div style="background: var(--light-bg); padding: 1rem; border-radius: 10px; text-align: center;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: 600;">REMAINING SESSIONS</span>
+                        <strong style="font-size: 1.6rem; color: var(--primary-blue);">${sessions} / 30</strong>
+                    </div>
+                    <div style="background: var(--light-bg); padding: 1rem; border-radius: 10px; text-align: center;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: 600;">LOYALTY POINTS</span>
+                        <strong style="font-size: 1.6rem; color: var(--success-green);">${points} ⭐</strong>
+                    </div>
+                </div>
+
+                <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem;">Student Log History</h4>
+                ${historyLines}
+            `;
+
+            document.getElementById('student-detail-modal-title').textContent = `${student.firstName}'s Academic Profile`;
+            openModal('student-detail-modal');
+        }
+
+        // Render Reservations Approve / Reject
+        function renderReservationsTable() {
+            const tbody = document.getElementById('reservations-table-tbody');
+            tbody.innerHTML = '';
+
+            if (reservations.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">No pending reservations found.</td></tr>`;
+                return;
+            }
+
+            reservations.forEach(r => {
+                const tr = document.createElement('tr');
+                let badgeClass = 'pending';
+                if (r.status === 'Confirmed') badgeClass = 'active';
+                if (r.status === 'Declined') badgeClass = 'ended';
+
+                const actionsHtml = r.status === 'Pending' ? `
+                    <button class="btn-action-sm success" onclick="handleReservationAction('${r.id}', 'Confirmed')">✓ Approve</button>
+                    <button class="btn-action-sm danger" onclick="handleReservationAction('${r.id}', 'Declined')">✗ Decline</button>
+                ` : `<button class="btn-action-sm secondary" onclick="deleteReservation('${r.id}')">🗑️ Delete</button>`;
+
+                tr.innerHTML = `
+                    <td><strong>${r.id}</strong></td>
+                    <td>${r.studentId}</td>
+                    <td>${r.studentName}</td>
+                    <td>Room ${r.labRoom}</td>
+                    <td>PC #${r.pcNumber}</td>
+                    <td>${r.date}</td>
+                    <td><span style="font-size: 0.75rem; color: var(--text-muted);">${r.timeSlot}</span></td>
+                    <td><span class="badge-status ${badgeClass}">${r.status}</span></td>
+                    <td>${actionsHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function handleReservationAction(resId, status) {
+            const index = reservations.findIndex(r => r.id === resId);
+            if (index === -1) return;
+
+            reservations[index].status = status;
+            localStorage.setItem('admin_reservations', JSON.stringify(reservations));
+            
+            renderReservationsTable();
+            updateDashboardStatistics();
+            alert(`Reservation status updated to ${status}.`);
+        }
+
+        function deleteReservation(resId) {
+            if (confirm('Delete this reservation entry?')) {
+                reservations = reservations.filter(r => r.id !== resId);
+                localStorage.setItem('admin_reservations', JSON.stringify(reservations));
+                renderReservationsTable();
+                updateDashboardStatistics();
+            }
+        }
+
+        // Render Announcements
+        function renderAnnouncements() {
+            const container = document.getElementById('announcements-list-panel');
+            container.innerHTML = '';
+
+            if (announcements.length === 0) {
+                container.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 2rem;">No active broadcasts posted right now.</p>`;
+                return;
+            }
+
+            announcements.forEach(a => {
+                const isImportant = a.tag === 'URGENT' ? 'important' : '';
+                const card = document.createElement('div');
+                card.className = `announcement-item ${isImportant}`;
+                card.style.position = 'relative';
+                card.innerHTML = `
+                    <button onclick="deleteAnnouncement(${a.id})" style="position: absolute; right: 10px; top: 10px; background: none; border: none; font-size: 1.1rem; color: var(--text-muted); cursor: pointer; hover:color:var(--danger-red);">🗑️</button>
+                    <span class="announcement-badge">${a.tag}</span>
+                    <h4 class="announcement-title">${a.title}</h4>
+                    <p class="announcement-desc">${a.desc}</p>
+                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted);">
+                        <span>Audience: ${a.scope}</span>
+                        <span>Published: ${a.date}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function handleAnnouncementSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('announcement-title').value;
+            const tag = document.getElementById('announcement-tag').value;
+            const scope = document.getElementById('announcement-scope').value;
+            const desc = document.getElementById('announcement-desc').value;
+
+            const newAnn = {
+                id: announcements.length > 0 ? Math.max(...announcements.map(a => a.id)) + 1 : 1,
+                title: title,
+                tag: tag,
+                scope: scope,
+                desc: desc,
+                date: "Just Now"
+            };
+
+            announcements.unshift(newAnn); // Add to top
+            localStorage.setItem('admin_announcements', JSON.stringify(announcements));
+            
+            renderAnnouncements();
+            e.target.reset();
+            alert('New Announcement broadcast successfully!');
+        }
+
+        function deleteAnnouncement(id) {
+            if (confirm('Delete this announcement?')) {
+                announcements = announcements.filter(a => a.id !== id);
+                localStorage.setItem('admin_announcements', JSON.stringify(announcements));
+                renderAnnouncements();
+            }
+        }
+
+        // Render Feedback
+        function renderFeedback() {
+            const categoryFilter = document.getElementById('feedback-filter-category').value;
+            const tbody = document.getElementById('feedback-table-tbody');
+            tbody.innerHTML = '';
+
+            let logs = feedbackLogs;
+            if (categoryFilter) {
+                logs = logs.filter(f => f.category === categoryFilter);
+            }
+
+            if (logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">No feedback matched selected category.</td></tr>`;
+                return;
+            }
+
+            logs.forEach(f => {
+                const stars = "★".repeat(f.rating) + "☆".repeat(5 - f.rating);
+                let badgeClass = f.status === 'Reviewed' ? 'active' : 'pending';
+                const actionHtml = f.status === 'Pending' ? `<button class="btn-action-sm primary" onclick="markFeedbackReviewed('${f.subject}')">✓ Mark Reviewed</button>` : `<span style="font-size:0.75rem; color:var(--text-muted);">Resolved</span>`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${f.date}</td>
+                    <td><strong>${f.studentName}</strong></td>
+                    <td><span class="stat-badge" style="background: rgba(59, 130, 246, 0.1); color: var(--info-blue);">${f.category}</span></td>
+                    <td><strong>${f.subject}</strong></td>
+                    <td><p style="max-width: 250px; white-space: normal; overflow: hidden; text-overflow: ellipsis; font-size:0.75rem; line-height: 1.3;">${f.message}</p></td>
+                    <td><span style="color: var(--accent-yellow); font-size:0.95rem;">${stars}</span></td>
+                    <td><span class="badge-status ${badgeClass}">${f.status}</span></td>
+                    <td>${actionHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function markFeedbackReviewed(subject) {
+            const index = feedbackLogs.findIndex(f => f.subject === subject);
+            if (index === -1) return;
+
+            feedbackLogs[index].status = 'Reviewed';
+            localStorage.setItem('admin_feedbacks', JSON.stringify(feedbackLogs));
+            renderFeedback();
+            alert('Feedback updated to Reviewed status.');
+        }
+
+        // Open points modal
+        function openAwardPointsModal(studentId) {
+            switchTab('tab-rewards');
+            document.getElementById('award-id').value = studentId;
+        }
+
+        // Award Rewards/Points
+        function handleAwardPointsSubmit(e) {
+            e.preventDefault();
+            const studentId = document.getElementById('award-id').value;
+            const amount = parseInt(document.getElementById('award-amount').value);
+            const type = document.getElementById('award-type').value;
+            const desc = document.getElementById('award-desc').value;
+
+            if (!studentId) {
+                alert('Please select a student.');
+                return;
+            }
+
+            const student = dbStudents.find(s => s.idNumber === studentId);
+            if (!student) return;
+
+            // Award points
+            const currentPoints = parseInt(localStorage.getItem(`pts_${studentId}`)) || 0;
+            localStorage.setItem(`pts_${studentId}`, (currentPoints + amount).toString());
+
+            // Log point award
+            const newReward = {
+                id: "RE-" + Math.floor(Math.random() * 900 + 100),
+                studentId: studentId,
+                studentName: `${student.firstName} ${student.lastName}`,
+                amount: amount,
+                type: type,
+                desc: desc,
+                date: "Just Now"
+            };
+
+            rewardPointsLog.unshift(newReward);
+            localStorage.setItem('admin_reward_logs', JSON.stringify(rewardPointsLog));
+
+            // Refresh UI
+            renderLeaderboard();
+            renderRecentRewardsLog();
+            e.target.reset();
+
+            alert(`Points successfully awarded! ${student.firstName} earned +${amount} points.`);
+        }
+
+        function renderRecentRewardsLog() {
+            const container = document.getElementById('recent-rewards-log-list');
+            container.innerHTML = '';
+
+            if (rewardPointsLog.length === 0) {
+                container.innerHTML = `<p style="font-size:0.75rem; text-align: center; color: var(--text-muted); padding: 1rem;">No recent points transactions.</p>`;
+                return;
+            }
+
+            rewardPointsLog.slice(0, 5).forEach(r => {
+                const div = document.createElement('div');
+                div.style = "background: var(--light-bg); border-left: 3px solid var(--success-green); padding: 0.5rem; border-radius: 6px; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center;";
+                div.innerHTML = `
+                    <div>
+                        <strong style="color: var(--text-dark);">${r.studentName}</strong>
+                        <p style="font-size: 0.65rem; color: var(--text-muted); margin:0;">${r.desc}</p>
+                    </div>
+                    <span style="font-weight: 700; color: var(--success-green);">+${r.amount} pts</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // ================== GENERATE REPORTS (CSV, Docs, PDF) ==================
+        function generateReport() {
+            const type = document.getElementById('report-data-type').value;
+            const scope = document.getElementById('report-date-range').value;
+            const format = document.getElementById('report-format').value;
+
+            let reportData = [];
+            let columns = [];
+            let title = '';
+
+            if (type === 'students') {
+                title = 'CCS Registered Students Directory Report';
+                columns = ['Student ID', 'Last Name', 'First Name', 'Email', 'Course', 'Year Level', 'Remaining Sessions', 'Reward Points'];
+                reportData = dbStudents.map(s => {
+                    return [
+                        s.idNumber,
+                        s.lastName,
+                        s.firstName,
+                        s.email,
+                        s.course,
+                        s.courseLevel,
+                        localStorage.getItem(`sess_${s.idNumber}`) || '30',
+                        localStorage.getItem(`pts_${s.idNumber}`) || '100'
+                    ];
+                });
+            } else if (type === 'current-sitins') {
+                title = 'CCS Active Lab Sit-In Audit Report';
+                columns = ['Student ID', 'Student Name', 'Lab Room', 'PC Number', 'Check-In Time', 'Purpose'];
+                reportData = ongoingSitIns.map(s => [s.studentId, s.studentName, s.labRoom, s.pcNumber, s.checkInTime, s.purpose]);
+            } else if (type === 'sit-in-logs') {
+                title = 'CCS Historical Lab Sit-In Log Report';
+                columns = ['Student ID', 'Student Name', 'Lab Room', 'PC Number', 'Check-In DateTime', 'Check-Out DateTime', 'Purpose'];
+                reportData = sitInHistory.map(h => [h.studentId, h.studentName, h.labRoom, h.pcNumber, h.checkInTime, h.checkOutTime, h.purpose]);
+            } else if (type === 'reservations') {
+                title = 'CCS Lab Slot Reservations Allocation Report';
+                columns = ['Res ID', 'Student ID', 'Student Name', 'Lab Room', 'PC', 'Date', 'Time Slot', 'Status'];
+                reportData = reservations.map(r => [r.id, r.studentId, r.studentName, r.labRoom, r.pcNumber, r.date, r.timeSlot, r.status]);
+            } else if (type === 'feedback') {
+                title = 'CCS Systems & Infrastructure Service Feedback Report';
+                columns = ['Date', 'Student Name', 'Category', 'Subject', 'Message', 'Rating', 'Status'];
+                reportData = feedbackLogs.map(f => [f.date, f.studentName, f.category, f.subject, f.message, f.rating + " Stars", f.status]);
+            }
+
+            const filename = `${type}_report_${new Date().toISOString().split('T')[0]}`;
+
+            // Trigger corresponding exporter
+            if (format === 'csv') {
+                exportCSV(columns, reportData, filename);
+            } else if (format === 'doc') {
+                exportDOC(title, columns, reportData, filename);
+            } else if (format === 'pdf') {
+                exportPDF(title, columns, reportData);
+            }
+        }
+
+        // Native CSV download
+        function exportCSV(headers, rows, filename) {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Append header line
+            csvContent += headers.join(",") + "\r\n";
+            
+            // Append data rows
+            rows.forEach(row => {
+                const escapedRow = row.map(val => {
+                    let str = String(val).replace(/"/g, '""'); // escape quotes
+                    if (str.includes(",") || str.includes("\n")) {
+                        str = `"${str}"`; // wrap in quotes if commas exist
+                    }
+                    return str;
+                });
+                csvContent += escapedRow.join(",") + "\r\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `${filename}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Native Microsoft Word (.doc) formatted download with gorgeous inline styling
+        function exportDOC(title, headers, rows, filename) {
+            let htmlTable = `
+                <h1 style="color:#0F3D91; font-family: Arial, sans-serif; text-align:center; margin-bottom: 2rem;">${title}</h1>
+                <p style="font-family: Arial; font-size: 0.95rem; color:#64748B;">Date Generated: ${new Date().toLocaleString()}</p>
+                <p style="font-family: Arial; font-size: 0.95rem; color:#64748B;">Generated By: System Administrator (CCS Monitoring System)</p>
+                <br/>
+                <table style="width:100%; border-collapse:collapse; font-family: Arial; font-size:0.85rem;">
+                    <thead>
+                        <tr style="background-color:#0F3D91; color:white;">
+                            ${headers.map(h => `<th style="padding:10px; border:1px solid #E2E8F0; text-align:left;">${h}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(row => `
+                            <tr>
+                                ${row.map(val => `<td style="padding:10px; border:1px solid #E2E8F0;">${val}</td>`).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+                  "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+                  "xmlns='http://www.w3.org/TR/REC-html40'>"+
+                  "<head><title>CCS Compliance Report</title><style>body {font-family: Arial, sans-serif;}</style></head><body>";
+            const footer = "</body></html>";
+            const sourceHTML = header + htmlTable + footer;
+            
+            const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+            const fileDownload = document.createElement("a");
+            document.body.appendChild(fileDownload);
+            fileDownload.href = source;
+            fileDownload.download = `${filename}.doc`;
+            fileDownload.click();
+            document.body.removeChild(fileDownload);
+        }
+
+        // Native PDF Exporter via print window overlay layout
+        function exportPDF(title, headers, rows) {
+            const printArea = document.getElementById('print-report-container');
+            printArea.style.display = 'block';
+            printArea.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #0F3D91; padding-bottom:1.5rem; margin-bottom:2rem;">
+                    <div>
+                        <h1 style="color:#0F3D91; font-size: 1.8rem; font-weight:800; margin:0;">COLLEGE OF COMPUTER STUDIES</h1>
+                        <p style="font-size:0.9rem; color:#64748B; margin: 0.25rem 0 0 0;">CCS Academic & Lab Monitoring System Report</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <h2 style="font-size:1.1rem; color:#1E293B; margin:0;">COMPLIANCE AUDIT DOCUMENT</h2>
+                        <p style="font-size:0.75rem; color:#64748B; margin:0.25rem 0 0 0;">CONFIDENTIAL</p>
+                    </div>
+                </div>
+
+                <h2 style="color:#082654; font-size:1.3rem; margin-bottom: 1.5rem;">${title}</h2>
+                <div style="display:flex; justify-content:space-between; font-size: 0.8rem; color:#64748B; margin-bottom:2rem;">
+                    <span>Date Generated: ${new Date().toLocaleString()}</span>
+                    <span>Issued By: System Administrator</span>
+                </div>
+
+                <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+                    <thead>
+                        <tr style="background-color:#0F3D91; color:white;">
+                            ${headers.map(h => `<th style="padding:12px; border:1px solid #E2E8F0; text-align:left;">${h}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(row => `
+                            <tr style="page-break-inside:avoid;">
+                                ${row.map(val => `<td style="padding:10px; border:1px solid #E2E8F0;">${val}</td>`).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <div style="margin-top:4rem; page-break-inside:avoid; display:flex; justify-content:flex-end;">
+                    <div style="text-align:center; width:220px; border-top: 1px solid #64748B; padding-top:0.5rem;">
+                        <strong style="font-size:0.85rem; color:#1E293B;">System Administrator</strong>
+                        <p style="font-size:0.75rem; color:#64748B; margin:0;">CCS Dean's Office Authorized Signature</p>
+                    </div>
+                </div>
+            `;
+
+            window.print();
+            printArea.style.display = 'none';
+            printArea.innerHTML = '';
+        }
+
+        // ================== GENERAL MODALS ==================
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if (m) m.classList.add('active');
+        }
+
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if (m) m.classList.remove('active');
+        }
+
+        // Bind outside clicks and escape key
+        document.querySelectorAll('.modal-overlay').forEach(o => {
+            o.addEventListener('click', function(e) {
+                if (e.target === this) closeModal(this.id);
+            });
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(o => closeModal(o.id));
+            }
+        });
+    </script>
+</body>
+</html>

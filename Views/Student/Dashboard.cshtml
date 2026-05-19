@@ -1,0 +1,1976 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Student Dashboard";
+
+    // Ensure we read ViewBag values as strings to avoid dynamic binder issues
+    var _vbStudentName = ViewBag.StudentName;
+    string studentName = _vbStudentName != null ? _vbStudentName.ToString() : "Student";
+    string initials = "ST";
+
+    // Split name for first/last name fields (no LINQ)
+    var studentNameParts = studentName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    var firstName = studentNameParts.Length > 0 ? studentNameParts[0] : "";
+    var lastName = studentNameParts.Length > 1 ? string.Join(" ", studentNameParts, 1, studentNameParts.Length - 1) : "";
+
+    try
+    {
+        var parts = studentName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        string tempInitials = "";
+        for (int i = 0; i < parts.Length && tempInitials.Length < 2; i++)
+        {
+            if (!string.IsNullOrWhiteSpace(parts[i]))
+            {
+                tempInitials += parts[i][0];
+            }
+        }
+        if (!string.IsNullOrEmpty(tempInitials))
+        {
+            initials = tempInitials.ToUpper();
+        }
+    }
+    catch
+    {
+        initials = "ST";
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0F3D91;
+            --primary-dark: #082654;
+            --accent-yellow: #F4B400;
+            --light-bg: #F5F7FB;
+            --card-bg: #FFFFFF;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --border-light: #E2E8F0;
+            --success-green: #10B981;
+            --warning-orange: #F59E0B;
+            --danger-red: #EF4444;
+            --info-blue: #3B82F6;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR STYLE */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(15, 61, 145, 0.2);
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-yellow);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+        }
+
+        .sidebar-logo-text h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.2rem;
+        }
+
+        .sidebar-logo-text p {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .sidebar-menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .sidebar-menu-item.active {
+            background: var(--accent-yellow);
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .sidebar-menu-item .icon {
+            width: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-profile {
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .sidebar-profile-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid var(--accent-yellow);
+            flex-shrink: 0;
+        }
+
+        .sidebar-profile-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--accent-yellow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-profile-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar-profile-info p:first-child {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-profile-info p:last-child {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 0;
+        }
+
+        /* MAIN CONTENT & TOP NAVBAR */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-navbar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex: 1;
+        }
+
+        .navbar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .navbar-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--light-bg);
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .navbar-icon:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .navbar-icon.notification::after {
+            content: '•';
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            color: var(--danger-red);
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-yellow), #FFD54F);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary-blue);
+            font-size: 1rem;
+        }
+
+        .navbar-user-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid var(--accent-yellow);
+        }
+
+        .navbar-user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-red);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: var(--danger-red);
+            color: white;
+        }
+
+        /* WELCOME BANNER */
+        .dashboard-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1a5fbf 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(15, 61, 145, 0.15);
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .welcome-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-text p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1.2rem;
+        }
+
+        .welcome-badges {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .welcome-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .welcome-badge strong {
+            color: var(--accent-yellow);
+            font-weight: 700;
+        }
+
+        .welcome-date {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .welcome-date-day {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .welcome-date-month {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .welcome-date-year {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.25rem;
+        }
+
+        /* STATS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-blue);
+            transform: translateY(-4px);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .stat-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background: var(--light-bg);
+        }
+
+        .stat-card-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--light-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--info-blue));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .stat-badge {
+            display: inline-block;
+            background: var(--accent-yellow);
+            color: var(--primary-blue);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        /* GRID CONTENT */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-light);
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 1rem;
+        }
+
+        .dashboard-card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .dashboard-card-link {
+            font-size: 0.8rem;
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .dashboard-card-link:hover {
+            color: var(--accent-yellow);
+        }
+
+        /* ANNOUNCEMENTS LIST */
+        .announcements-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .announcement-item {
+            padding: 1rem;
+            background: var(--light-bg);
+            border-left: 4px solid var(--primary-blue);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .announcement-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .announcement-item.important {
+            border-left-color: var(--warning-orange);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .announcement-badge {
+            display: inline-block;
+            background: var(--primary-blue);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .announcement-item.important .announcement-badge {
+            background: var(--warning-orange);
+        }
+
+        .announcement-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .announcement-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .announcement-date {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* RESERVATIONS WIDGET IN STATS */
+        .reservations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .reservation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--light-bg);
+            padding: 0.75rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        .reservation-info h4 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .reservation-info p {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .reservation-status {
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+
+        .reservation-status.active {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success-green);
+        }
+
+        .reservation-status.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning-orange);
+        }
+
+        .reservation-status.confirmed {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--info-blue);
+        }
+
+        /* ACTIVITY CHART Vertical bars */
+        .activity-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 200px;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(180deg, var(--primary-blue), #1a5fbf);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-height: 20px;
+        }
+
+        .chart-bar:hover {
+            background: linear-gradient(180deg, var(--accent-yellow), #FFD54F);
+            transform: scaleY(1.05);
+        }
+
+        .chart-bar.highlight {
+            background: linear-gradient(180deg, var(--accent-yellow), #FFD54F);
+        }
+
+        /* NOTIFICATIONS LIST */
+        .notifications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .notification-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--light-bg);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .notification-icon.success {
+            background: var(--success-green);
+        }
+
+        .notification-icon.warning {
+            background: var(--warning-orange);
+        }
+
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.2rem;
+        }
+
+        .notification-message {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .notification-time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* MODALS */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
+
+        @@keyframes slideIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--light-bg);
+            color: var(--text-dark);
+        }
+
+        .info-group {
+            background: var(--light-bg);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-group-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .info-group-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(15, 61, 145, 0.1);
+        }
+
+        .form-group input[readonly] {
+            background-color: var(--light-bg);
+            cursor: not-allowed;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-light);
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(15, 61, 145, 0.2);
+        }
+
+        .btn-secondary {
+            background: var(--light-bg);
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-light);
+        }
+
+        .session-item, .reward-item, .rule-item {
+            padding: 1rem;
+            background: var(--light-bg);
+            border-left: 4px solid var(--primary-blue);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .session-item h4, .reward-item h4, .rule-item h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .session-item p, .reward-item p, .rule-item p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* STAR RATINGS FEEDBACK */
+        .stars-container {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            margin-top: 0.25rem;
+            cursor: pointer;
+        }
+
+        .star-item {
+            color: var(--border-light);
+            transition: color 0.2s ease;
+        }
+
+        .star-item.active {
+            color: var(--accent-yellow);
+        }
+
+        .view-all-btn {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border: 1px dashed var(--primary-blue);
+            background: rgba(15, 61, 145, 0.02);
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 0.8rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-all-btn:hover {
+            background: rgba(15, 61, 145, 0.05);
+            border-style: solid;
+        }
+
+        /* SCROLLBARS */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-blue);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">🎓</div>
+                <div class="sidebar-logo-text">
+                    <h3>CCS Student</h3>
+                    <p>Dashboard Portal</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Main Portal</div>
+                    <a href="#" class="sidebar-menu-item active" data-modal="dashboard-modal">
+                        <span class="icon">📊</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="sidebar-menu-item" data-modal="edit-profile-modal">
+                        <span class="icon">👤</span>
+                        <span>My Account Profile</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Laboratory Operations</div>
+                    <a href="#" class="sidebar-menu-item" data-modal="sessions-modal">
+                        <span class="icon">📅</span>
+                        <span>Remaining Sessions</span>
+                    </a>
+                    <a href="#" class="sidebar-menu-item" data-modal="reservation-modal">
+                        <span class="icon">🏠</span>
+                        <span>Make Reservation</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Perks & Guidelines</div>
+                    <a href="#" class="sidebar-menu-item" data-modal="rewards-modal">
+                        <span class="icon">⭐</span>
+                        <span>Loyalty & Rewards</span>
+                    </a>
+                    <a href="#" class="sidebar-menu-item" data-modal="rules-modal">
+                        <span class="icon">📜</span>
+                        <span>Lab Rules & Conduct</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">Broadcasts & Surveys</div>
+                    <a href="#" class="sidebar-menu-item" data-modal="announcements-modal">
+                        <span class="icon">📢</span>
+                        <span>Announcements</span>
+                    </a>
+                    <a href="#" class="sidebar-menu-item" data-modal="feedback-modal">
+                        <span class="icon">💬</span>
+                        <span>Send System Feedback</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-profile">
+                @if (ViewBag.ProfilePicture != null && !string.IsNullOrEmpty(ViewBag.ProfilePicture.ToString()))
+                {
+                    <img class="sidebar-profile-img" src="@ViewBag.ProfilePicture" alt="Avatar" />
+                }
+                else
+                {
+                    <div class="sidebar-profile-avatar">@initials</div>
+                }
+                <div class="sidebar-profile-info">
+                    <p>@studentName</p>
+                    <p>ID: @(ViewBag.StudentId ?? "N/A")</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN MAIN CONTENT -->
+        <div class="main-content">
+            <!-- TOP NAVBAR -->
+            <nav class="top-navbar">
+                <div class="navbar-left">
+                    <h2 class="navbar-title">Student Dashboard</h2>
+                </div>
+                <div class="navbar-right">
+                    <div class="navbar-icon notification" title="System alerts" onclick="openModal('notifications-modal')">🔔</div>
+                    
+                    <div class="navbar-user" onclick="openModal('edit-profile-modal')">
+                        @if (ViewBag.ProfilePicture != null && !string.IsNullOrEmpty(ViewBag.ProfilePicture.ToString()))
+                        {
+                            <img class="navbar-user-img" src="@ViewBag.ProfilePicture" alt="Profile" />
+                        }
+                        else
+                        {
+                            <div class="navbar-user-avatar">@initials</div>
+                        }
+                        <span class="navbar-user-name">@(firstName ?? "Student")</span>
+                    </div>
+
+                    <form method="post" asp-controller="Student" asp-action="Logout" style="display:inline;">
+                        <button type="submit" class="btn-logout">
+                            <span>Logout</span>🚪
+                        </button>
+                    </form>
+                </div>
+            </nav>
+
+            <div class="dashboard-content">
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <div class="welcome-content">
+                        <div class="welcome-text">
+                            <h1>Welcome back, @studentName! 👋</h1>
+                            <p>Track your laboratory reservations, remaining slots, and earn achievements throughout the semester.</p>
+                            <div class="welcome-badges">
+                                <div class="welcome-badge">● <strong>Status:</strong> Active Account</div>
+                                <div class="welcome-badge">● <strong>Program:</strong> @(ViewBag.Course ?? "N/A")</div>
+                                <div class="welcome-badge">● <strong>Year Level:</strong> @(ViewBag.CourseLevel ?? "N/A") Year</div>
+                                <div class="welcome-badge">● <strong>ID Number:</strong> @(ViewBag.StudentId ?? "N/A")</div>
+                            </div>
+                        </div>
+                        <div class="welcome-date">
+                            <div class="welcome-date-day">@DateTime.Now.Day</div>
+                            <div class="welcome-date-month">@DateTime.Now.ToString("MMMM").Substring(0, 3)</div>
+                            <div class="welcome-date-year">@DateTime.Now.Year</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Widgets -->
+                <div class="stats-grid">
+                    <div class="stat-card" style="cursor: pointer;" onclick="openModal('sessions-modal')">
+                        <div class="stat-card-header">
+                            <div class="stat-card-title">Remaining Sessions</div>
+                            <div class="stat-card-icon">📅</div>
+                        </div>
+                        <div class="stat-card-value" id="display-remaining-sessions">30</div>
+                        <div class="stat-card-subtitle">Out of 30 total sessions</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="display-remaining-progress" style="width: 100%;"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>Progress</span>
+                            <span id="display-remaining-percent">100%</span>
+                        </div>
+                        <p style="font-size: 0.8rem; color: var(--warning-orange); margin-top: 1rem;">⚠️ Session resets on June 15, 2026</p>
+                    </div>
+
+                    <div class="stat-card" style="cursor: pointer;" onclick="openModal('rewards-modal')">
+                        <div class="stat-card-header">
+                            <div class="stat-card-title">Rewards & Loyalty Points</div>
+                            <div class="stat-card-icon">⭐</div>
+                        </div>
+                        <div class="stat-badge" id="display-rewards-tier">⭐ Bronze Tier</div>
+                        <div class="stat-card-value" id="display-rewards-points">100</div>
+                        <div class="stat-card-subtitle">Loyalty points earned</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="display-rewards-progress" style="width: 10%; background: linear-gradient(90deg, var(--accent-yellow), #FFD54F);"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>To Silver Tier</span>
+                            <span id="display-rewards-percent">10%</span>
+                        </div>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">📈 Get 20 points per sit-in checkout</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-title">Active Lab Reservations</div>
+                            <div class="stat-card-icon">🏠</div>
+                        </div>
+                        <div class="stat-card-value" id="display-active-reservations-count">0</div>
+                        <div class="stat-card-subtitle">Approved / Pending bookings</div>
+                        <div class="reservations-list" id="display-reservations-list" style="margin-top: 1rem;">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Session Activity Chart -->
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h3 class="dashboard-card-title">📈 Your Weekly Activity Load</h3>
+                            <span class="dashboard-card-link" onclick="openModal('sessions-modal')">View Logs →</span>
+                        </div>
+                        <div class="activity-chart">
+                            <div class="chart-bar" style="height: 35%;" title="Monday: 1.5 Hours"></div>
+                            <div class="chart-bar highlight" style="height: 75%;" title="Tuesday: 3.5 Hours (Peak)"></div>
+                            <div class="chart-bar" style="height: 50%;" title="Wednesday: 2.2 Hours"></div>
+                            <div class="chart-bar" style="height: 20%;" title="Thursday: 1.0 Hour"></div>
+                            <div class="chart-bar" style="height: 60%;" title="Friday: 2.8 Hours"></div>
+                            <div class="chart-bar" style="height: 10%;" title="Saturday: 0.5 Hour"></div>
+                            <div class="chart-bar" style="height: 0%;" title="Sunday: Closed"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 2rem;">
+                            <div style="flex: 1;">Mon</div>
+                            <div style="flex: 1;">Tue</div>
+                            <div style="flex: 1;">Wed</div>
+                            <div style="flex: 1;">Thu</div>
+                            <div style="flex: 1;">Fri</div>
+                            <div style="flex: 1;">Sat</div>
+                            <div style="flex: 1;">Sun</div>
+                        </div>
+                    </div>
+
+                    <!-- Announcements Feed -->
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h3 class="dashboard-card-title">📢 Lab Announcements</h3>
+                            <span class="dashboard-card-link" onclick="openModal('announcements-modal')">View All →</span>
+                        </div>
+                        <div class="announcements-list" id="display-announcements-list">
+                            <!-- Dynamic Content -->
+                        </div>
+                        <button class="view-all-btn" onclick="openModal('announcements-modal')">View All Bulletins →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================== MODAL POPUPS ================== -->
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="edit-profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Profile Details</h2>
+                <button class="modal-close-btn" onclick="closeModal('edit-profile-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-profile-form" onsubmit="handleProfileSubmit(event)">
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        @if (ViewBag.ProfilePicture != null && !string.IsNullOrEmpty(ViewBag.ProfilePicture.ToString()))
+                        {
+                            <img src="@ViewBag.ProfilePicture" alt="Profile Picture" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-blue);" />
+                        }
+                        else
+                        {
+                            <div style="width: 90px; height: 90px; border-radius: 50%; background: var(--accent-yellow); color: var(--primary-blue); font-size: 2.5rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 3px solid var(--primary-blue);">@initials</div>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profilePictureFile">Upload Profile Picture</label>
+                        <input type="file" id="profilePictureFile" accept="image/*" style="padding: 0.5rem; border: 1px solid var(--border-light);">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" value="@firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" value="@lastName" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" value="@(ViewBag.Email ?? "")" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Residential Address</label>
+                        <input type="text" id="address" value="@(ViewBag.Address ?? "")" required placeholder="Enter home address">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="course">Registered Course</label>
+                            <input type="text" id="course" value="@(ViewBag.Course ?? "")" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="year">Year Level</label>
+                            <input type="text" id="year" value="@(ViewBag.CourseLevel ?? "") Year" readonly>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('edit-profile-modal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remaining Sessions Modal -->
+    <div class="modal-overlay" id="sessions-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Your Sessions Progress</h2>
+                <button class="modal-close-btn" onclick="closeModal('sessions-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="info-group">
+                    <div class="info-group-label">Sessions Completed</div>
+                    <div class="info-group-value" id="modal-sessions-completed">0 / 30</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-group-label">Session Remaining Balance</div>
+                    <div class="info-group-value" id="modal-sessions-remaining">30 Sessions</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-group-label">Expiry Date</div>
+                    <div class="info-group-value">June 15, 2026</div>
+                </div>
+                
+                <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 0.95rem; font-weight: 700; color: var(--text-dark);">Your Checked-In Activity Logs</h3>
+                <div id="student-sitin-logs-list" style="max-height: 220px; overflow-y: auto;">
+                    <!-- Dynamic Logs -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeModal('sessions-modal')">Close Window</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcements Modal -->
+    <div class="modal-overlay" id="announcements-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">CCS Announcements Bulletin</h2>
+                <button class="modal-close-btn" onclick="closeModal('announcements-modal')">×</button>
+            </div>
+            <div class="modal-body" id="modal-announcements-list" style="max-height: 450px; overflow-y: auto;">
+                <!-- Dynamic Content -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeModal('announcements-modal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules & Regulations Modal -->
+    <div class="modal-overlay" id="rules-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">CCS Computer Laboratory Guidelines</h2>
+                <button class="modal-close-btn" onclick="closeModal('rules-modal')">×</button>
+            </div>
+            <div class="modal-body" style="max-height: 450px; overflow-y: auto;">
+                <div class="rule-item">
+                    <h4>1. Lab Entry & Exit Conduct</h4>
+                    <p>Always present your physical school ID. Log check-in and checkout sessions properly. Deductions occur for failed logouts.</p>
+                </div>
+                <div class="rule-item">
+                    <h4>2. Academic Purpose Limit</h4>
+                    <p>Computer stations are exclusively for coding, research, database design, and homework projects. Gaming or streaming is prohibited.</p>
+                </div>
+                <div class="rule-item">
+                    <h4>3. Reservation Cancellation Policy</h4>
+                    <p>Cancel pending bookings 24 hours prior if you cannot attend, making way for other students.</p>
+                </div>
+                <div class="rule-item">
+                    <h4>4. Food & Cleanliness</h4>
+                    <p>Strictly no food, soft drinks, or open coffee cups on laboratory computer tables. Only capped water flasks are allowed.</p>
+                </div>
+                <div class="rule-item">
+                    <h4>5. Equipment Protection</h4>
+                    <p>Report damaged keys, missing mouse indicators, or software timeouts immediately to the duty lab assistant. Do not attempt adjustments yourself.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeModal('rules-modal')">Accept Guidelines</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div class="modal-overlay" id="feedback-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Submit Lab Feedback</h2>
+                <button class="modal-close-btn" onclick="closeModal('feedback-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="feedback-form" onsubmit="handleFeedbackSubmit(event)">
+                    <div class="form-group">
+                        <label for="feedbackCategory">Feedback Target Category</label>
+                        <select id="feedbackCategory" required>
+                            <option value="Facilities">Facilities & Hardware Units</option>
+                            <option value="Systems">Software & Monitoring Portal</option>
+                            <option value="Instructors">Instructor or Assistant Support</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedbackSubject">Subject Subject</label>
+                        <input type="text" id="feedbackSubject" placeholder="e.g. Broken keyboard key, system logout error" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedbackRating">Rate Lab Services</label>
+                        <div class="stars-container" id="stars-selector">
+                            <span class="star-item active" data-rating="1">★</span>
+                            <span class="star-item active" data-rating="2">★</span>
+                            <span class="star-item active" data-rating="3">★</span>
+                            <span class="star-item active" data-rating="4">★</span>
+                            <span class="star-item active" data-rating="5">★</span>
+                        </div>
+                        <input type="hidden" id="feedbackRating" value="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="feedbackMessage">Detailed Message</label>
+                        <textarea id="feedbackMessage" rows="4" placeholder="Briefly describe your experience, issues, or compliments..." required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('feedback-modal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">File Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reservation Modal -->
+    <div class="modal-overlay" id="reservation-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Book Laboratory Computer Station</h2>
+                <button class="modal-close-btn" onclick="closeModal('reservation-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="reservation-form" onsubmit="handleReservationSubmit(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="labRoom">Select Lab Room</label>
+                            <select id="labRoom" required>
+                                <option value="101">Room 101 (Programming)</option>
+                                <option value="201">Room 201 (Database)</option>
+                                <option value="203">Room 203 (Multimedia)</option>
+                                <option value="305">Room 305 (Advanced)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pcNumber">Desired PC Unit #</label>
+                            <input type="number" id="pcNumber" min="1" max="40" placeholder="1 to 40" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reservationDate">Date of Reservation</label>
+                        <input type="date" id="reservationDate" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startTime">Time slot Start</label>
+                            <input type="time" id="startTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endTime">Time slot End</label>
+                            <input type="time" id="endTime" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Special Requirements / Purpose Notes</label>
+                        <textarea id="notes" rows="2" placeholder="e.g. Needs Visual Studio Code installed, or SQL Server connection."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('reservation-modal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Booking</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rewards Modal -->
+    <div class="modal-overlay" id="rewards-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Student Loyalty Points Catalog</h2>
+                <button class="modal-close-btn" onclick="closeModal('rewards-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="info-group" style="background: rgba(15, 61, 145, 0.05);">
+                    <div class="info-group-label">Current Balance</div>
+                    <div class="info-group-value" id="modal-rewards-points" style="color: var(--primary-blue); font-size: 1.3rem;">0 ⭐</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-group-label">Achieved Tier Level</div>
+                    <div class="info-group-value" id="modal-rewards-tier">🏆 Bronze Tier</div>
+                </div>
+                
+                <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 0.95rem; font-weight: 700; color: var(--text-dark);">Loyalty Reward Milestones</h3>
+                <div class="reward-item" style="border-left-color: var(--success-green);">
+                    <h4>🥉 Bronze Tier (0 - 500 points)</h4>
+                    <p>Benefits: Access to all public computer stations and basic priority booking lines.</p>
+                </div>
+                <div class="reward-item" style="border-left-color: var(--info-blue);">
+                    <h4>🥈 Silver Tier (501 - 1000 points)</h4>
+                    <p>Benefits: Double checkout points multiplier, access to multimedia labs on weekends.</p>
+                </div>
+                <div class="reward-item" style="border-left-color: var(--accent-yellow);">
+                    <h4>🏆 Gold Tier (1001 - 2000 points)</h4>
+                    <p>Benefits: Early event booking priority, invitations to technical coding bootcamp bootcamps.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeModal('rewards-modal')">Close Catalog</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Modal -->
+    <div class="modal-overlay" id="notifications-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">System Alerts & Notifications</h2>
+                <button class="modal-close-btn" onclick="closeModal('notifications-modal')">×</button>
+            </div>
+            <div class="modal-body" id="modal-notifications-list" style="max-height: 450px; overflow-y: auto;">
+                <!-- Dynamic Content -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeModal('notifications-modal')">Close Alerts</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Modal -->
+    <div class="modal-overlay" id="dashboard-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Student Portal Guide</h2>
+                <button class="modal-close-btn" onclick="closeModal('dashboard-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <p>Welcome to the College of Computer Studies Laboratory Portal! You are already viewing your main dashboard overview workspace.</p>
+                <div style="background: var(--light-bg); border-left: 4px solid var(--primary-blue); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    <strong style="display: block; margin-bottom: 0.5rem;">Quick Navigation Guide:</strong>
+                    <ul style="padding-left: 1.25rem; font-size: 0.8rem; line-height: 1.5; color: var(--text-muted);">
+                        <li>Click "My Account Profile" to upload custom avatar photos.</li>
+                        <li>Click "Make Reservation" to book preferred PC stations in advance.</li>
+                        <li>Deductions and points happen immediately when checkout actions occurs.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeModal('dashboard-modal')">Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================== SCRIPTS IMPLEMENTATION ================== -->
+    <script>
+        const studentId = '@(ViewBag.StudentId ?? "")';
+        const studentFullName = '@Html.Raw(studentName)';
+
+        // Open modal
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Close modal
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if (m) {
+                m.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Core dynamic sync loop
+        function syncStudentDashboardState() {
+            if (!studentId) return;
+
+            // 1. Load sessions remaining
+            const sessionsRem = parseInt(localStorage.getItem(`sess_${studentId}`)) !== null ? 
+                                parseInt(localStorage.getItem(`sess_${studentId}`)) : 30;
+            if (isNaN(sessionsRem)) {
+                localStorage.setItem(`sess_${studentId}`, '30');
+            }
+            const currentSessions = parseInt(localStorage.getItem(`sess_${studentId}`)) || 30;
+            const completedSessions = 30 - currentSessions;
+
+            document.getElementById('display-remaining-sessions').textContent = currentSessions;
+            document.getElementById('display-remaining-progress').style.width = `${(currentSessions / 30) * 100}%`;
+            document.getElementById('display-remaining-percent').textContent = `${Math.round((currentSessions / 30) * 100)}%`;
+            document.getElementById('modal-sessions-completed').textContent = `${completedSessions} / 30 completed`;
+            document.getElementById('modal-sessions-remaining').textContent = `${currentSessions} Sessions Left`;
+
+            // 2. Load loyalty rewards points
+            const currentPoints = parseInt(localStorage.getItem(`pts_${studentId}`)) || 100;
+            document.getElementById('display-rewards-points').textContent = currentPoints.toLocaleString();
+            document.getElementById('modal-rewards-points').textContent = `${currentPoints.toLocaleString()} ⭐`;
+
+            let tier = '🥉 Bronze Tier';
+            let progress = 10;
+            if (currentPoints > 1000) {
+                tier = '🏆 Gold Tier';
+                progress = 100;
+            } else if (currentPoints > 500) {
+                tier = '🥈 Silver Tier';
+                progress = Math.round(((currentPoints - 500) / 500) * 100);
+            } else {
+                progress = Math.round((currentPoints / 500) * 100);
+            }
+
+            document.getElementById('display-rewards-tier').textContent = tier;
+            document.getElementById('modal-rewards-tier').textContent = tier;
+            document.getElementById('display-rewards-progress').style.width = `${progress}%`;
+            document.getElementById('display-rewards-percent').textContent = `${progress}%`;
+
+            // 3. Load active student reservations
+            const allReservations = JSON.parse(localStorage.getItem('admin_reservations')) || [];
+            const myReservations = allReservations.filter(r => r.studentId === studentId);
+            
+            document.getElementById('display-active-reservations-count').textContent = myReservations.length;
+            const resListContainer = document.getElementById('display-reservations-list');
+            resListContainer.innerHTML = '';
+
+            if (myReservations.length === 0) {
+                resListContainer.innerHTML = `<p style="font-size:0.75rem; text-align: center; color:var(--text-muted); margin-top: 1rem;">No current reservations. Book below!</p>`;
+            } else {
+                myReservations.slice(0, 3).forEach(r => {
+                    const statusClass = r.status.toLowerCase();
+                    const item = document.createElement('div');
+                    item.className = 'reservation-item';
+                    item.innerHTML = `
+                        <div class="reservation-info">
+                            <h4>Lab Room ${r.labRoom} - PC #${r.pcNumber}</h4>
+                            <p>${r.date} | ${r.timeSlot}</p>
+                        </div>
+                        <div class="reservation-status ${statusClass}">${r.status}</div>
+                    `;
+                    resListContainer.appendChild(item);
+                });
+            }
+
+            // 4. Load dynamic sit in logs in sessions modal
+            const allLogs = JSON.parse(localStorage.getItem('admin_sitin_history')) || [];
+            const myLogs = allLogs.filter(l => l.studentId === studentId);
+            const logsContainer = document.getElementById('student-sitin-logs-list');
+            logsContainer.innerHTML = '';
+
+            if (myLogs.length === 0) {
+                logsContainer.innerHTML = `<p style="font-size:0.75rem; color:var(--text-muted); padding:1rem; text-align:center;">No completed laboratory records checked in.</p>`;
+            } else {
+                myLogs.forEach(l => {
+                    const div = document.createElement('div');
+                    div.className = 'session-item';
+                    div.innerHTML = `
+                        <h4>Lab Room ${l.labRoom} - Computer Unit #${l.pcNumber}</h4>
+                        <p>🕒 Checked-In: ${l.checkInTime}</p>
+                        <p>🚪 Checked-Out: ${l.checkOutTime}</p>
+                        <p style="font-size:0.7rem; color:var(--info-blue); margin-top:0.25rem;">Purpose: ${l.purpose}</p>
+                    `;
+                    logsContainer.appendChild(div);
+                });
+            }
+
+            // 5. Load dynamic announcements
+            const allAnnouncements = JSON.parse(localStorage.getItem('admin_announcements')) || [];
+            const homeAnnContainer = document.getElementById('display-announcements-list');
+            const modalAnnContainer = document.getElementById('modal-announcements-list');
+            
+            homeAnnContainer.innerHTML = '';
+            modalAnnContainer.innerHTML = '';
+
+            if (allAnnouncements.length === 0) {
+                const emptyMsg = `<p style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:1.5rem;">No bulletins published.</p>`;
+                homeAnnContainer.innerHTML = emptyMsg;
+                modalAnnContainer.innerHTML = emptyMsg;
+            } else {
+                // Populate home panel previews (top 3)
+                allAnnouncements.slice(0, 3).forEach(a => {
+                    const isImportant = a.tag === 'URGENT' ? 'important' : '';
+                    const item = document.createElement('div');
+                    item.className = `announcement-item ${isImportant}`;
+                    item.innerHTML = `
+                        <div class="announcement-badge">${a.tag}</div>
+                        <div class="announcement-title">${a.title}</div>
+                        <div class="announcement-desc">${a.desc}</div>
+                        <div class="announcement-date">${a.date}</div>
+                    `;
+                    homeAnnContainer.appendChild(item);
+                });
+
+                // Populate modal full views
+                allAnnouncements.forEach(a => {
+                    const isImportant = a.tag === 'URGENT' ? 'important' : '';
+                    const item = document.createElement('div');
+                    item.className = `session-item ${isImportant}`;
+                    item.style.borderLeftWidth = '4px';
+                    item.style.borderLeftColor = a.tag === 'URGENT' ? 'var(--warning-orange)' : a.tag === 'Event' ? 'var(--info-blue)' : 'var(--primary-blue)';
+                    item.innerHTML = `
+                        <span class="announcement-badge" style="background: ${a.tag === 'URGENT' ? 'var(--warning-orange)' : a.tag === 'Event' ? 'var(--info-blue)' : 'var(--primary-blue)'};">${a.tag}</span>
+                        <h4 style="margin-top: 0.5rem;">${a.title}</h4>
+                        <p style="margin-top:0.25rem;">📅 Published ${a.date}</p>
+                        <p style="margin-top:0.5rem; color: var(--text-dark);">${a.desc}</p>
+                    `;
+                    modalAnnContainer.appendChild(item);
+                });
+            }
+
+            // 6. Load alerts notifications list
+            const modalNotifList = document.getElementById('modal-notifications-list');
+            modalNotifList.innerHTML = '';
+            
+            const systemNotifs = [
+                {
+                    icon: '⭐',
+                    title: 'Welcome Loyalty Reward Gift',
+                    message: 'Congratulations! You received starting balance +100 rewards points on profile activation.',
+                    time: 'Registration'
+                }
+            ];
+
+            // Append dynamic points rewards logs
+            const pointsLogs = JSON.parse(localStorage.getItem('admin_reward_logs')) || [];
+            const myPointsLogs = pointsLogs.filter(l => l.studentId === studentId);
+            myPointsLogs.forEach(l => {
+                systemNotifs.unshift({
+                    icon: '⭐',
+                    title: `Loyalty Points Earned (+${l.amount})`,
+                    message: `${l.desc} - Awarded for ${l.type}`,
+                    time: l.date
+                });
+            });
+
+            // Append dynamic bookings updates
+            myReservations.forEach(r => {
+                const icon = r.status === 'Confirmed' ? '✓' : r.status === 'Declined' ? '✗' : '🕒';
+                const successClass = r.status === 'Confirmed' ? 'success' : r.status === 'Declined' ? 'warning' : '';
+                systemNotifs.unshift({
+                    icon: icon,
+                    iconClass: successClass,
+                    title: `Booking Request ${r.status}`,
+                    message: `Lab booking reservation for PC Unit #${r.pcNumber} in Room ${r.labRoom} is ${r.status.toLowerCase()}.`,
+                    time: 'Recent'
+                });
+            });
+
+            systemNotifs.forEach(n => {
+                const item = document.createElement('div');
+                item.className = 'notification-item';
+                item.innerHTML = `
+                    <div class="notification-icon ${n.iconClass || ''}">${n.icon}</div>
+                    <div class="notification-content">
+                        <div class="notification-title">${n.title}</div>
+                        <div class="notification-message">${n.message}</div>
+                        <div class="notification-time">${n.time}</div>
+                    </div>
+                `;
+                modalNotifList.appendChild(item);
+            });
+        }
+
+        // Star rating select handler inside feedback
+        document.getElementById('stars-selector').querySelectorAll('.star-item').forEach(star => {
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.getAttribute('data-rating'));
+                document.getElementById('feedbackRating').value = rating;
+
+                const parent = document.getElementById('stars-selector');
+                parent.querySelectorAll('.star-item').forEach(s => {
+                    const r = parseInt(s.getAttribute('data-rating'));
+                    if (r <= rating) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        // Edit Profile Real DB multi-part FormData Post Submission
+        function handleProfileSubmit(e) {
+            e.preventDefault();
+            
+            const fName = document.getElementById('firstName').value.trim();
+            const lName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const fileInput = document.getElementById('profilePictureFile');
+
+            const fd = new FormData();
+            fd.append('idNumber', studentId);
+            fd.append('firstName', fName);
+            fd.append('lastName', lName);
+            fd.append('email', email);
+            fd.append('course', '@(ViewBag.Course ?? "")');
+            fd.append('courseLevel', '@(ViewBag.CourseLevel ?? "")');
+            fd.append('address', address);
+
+            if (fileInput.files.length > 0) {
+                fd.append('profilePictureFile', fileInput.files[0]);
+            }
+
+            fetch('/Student/UpdateProfile', {
+                method: 'POST',
+                body: fd
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Profile updated successfully in SQLite database! Applying changes.');
+                    window.location.reload();
+                } else {
+                    alert('Failed to save details: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Database offline/locked. Static profiles are emulated.');
+                closeModal('edit-profile-modal');
+            });
+        }
+
+        // Submit feedback to localStorage queue
+        function handleFeedbackSubmit(e) {
+            e.preventDefault();
+            const category = document.getElementById('feedbackCategory').value;
+            const subject = document.getElementById('feedbackSubject').value.trim();
+            const rating = parseInt(document.getElementById('feedbackRating').value);
+            const message = document.getElementById('feedbackMessage').value.trim();
+
+            const newFeed = {
+                date: new Date().toISOString().split('T')[0],
+                studentName: studentFullName,
+                category: category,
+                subject: subject,
+                message: message,
+                rating: rating,
+                status: "Pending"
+            };
+
+            const list = JSON.parse(localStorage.getItem('admin_feedbacks')) || [];
+            list.unshift(newFeed);
+            localStorage.setItem('admin_feedbacks', JSON.stringify(list));
+
+            alert('Your lab feedback was successfully sent! The administrator will review and resolve it.');
+            e.target.reset();
+            
+            // Reset stars selector to 5
+            document.getElementById('feedbackRating').value = 5;
+            document.getElementById('stars-selector').querySelectorAll('.star-item').forEach(s => s.classList.add('active'));
+
+            closeModal('feedback-modal');
+            syncStudentDashboardState();
+        }
+
+        // Submit reservation to localStorage queue
+        function handleReservationSubmit(e) {
+            e.preventDefault();
+            const room = document.getElementById('labRoom').value;
+            const pc = document.getElementById('pcNumber').value;
+            const date = document.getElementById('reservationDate').value;
+            const start = document.getElementById('startTime').value;
+            const end = document.getElementById('endTime').value;
+            const notes = document.getElementById('notes').value.trim();
+
+            // Validate PC limit
+            if (parseInt(pc) < 1 || parseInt(pc) > 40) {
+                alert('Please enter a PC unit number from 1 to 40.');
+                return;
+            }
+
+            const newRes = {
+                id: "RES-" + Math.floor(Math.random() * 9000 + 1000),
+                studentId: studentId,
+                studentName: studentFullName,
+                labRoom: room,
+                pcNumber: pc.padStart(2, '0'),
+                date: date,
+                timeSlot: `${start} - ${end}`,
+                status: "Pending"
+            };
+
+            const reservationsList = JSON.parse(localStorage.getItem('admin_reservations')) || [];
+            reservationsList.unshift(newRes);
+            localStorage.setItem('admin_reservations', JSON.stringify(reservationsList));
+
+            alert(`Reservation requested successfully! Lab Room ${room} PC Unit #${pc} is now pending admin approval.`);
+            e.target.reset();
+
+            closeModal('reservation-modal');
+            syncStudentDashboardState();
+        }
+
+        // Sidebar interactions
+        document.querySelectorAll('.sidebar-menu-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Clear active states
+                document.querySelectorAll('.sidebar-menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+
+                const targetModal = this.getAttribute('data-modal');
+                if (targetModal) openModal(targetModal);
+            });
+        });
+
+        // Initialize and sync State on load
+        document.addEventListener('DOMContentLoaded', function() {
+            syncStudentDashboardState();
+
+            // Restrict reservation date selector to today or ahead
+            const dateInput = document.getElementById('reservationDate');
+            if (dateInput) {
+                dateInput.setAttribute('min', new Date().toISOString().split('T')[0]);
+            }
+        });
+    </script>
+</body>
+</html>

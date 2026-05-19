@@ -1,0 +1,31 @@
+# .NET
+[Bb]in/
+[Oo]bj/
+*.exe
+*.dll
+*.pdb
+*.user
+*.suo
+*.sln.docstates
+*.userosscache
+*.sln.ids
+*.cache
+*.log
+*.binlog
+
+# Visual Studio
+.vs/
+.vscode/
+
+# Environment
+.env
+appsettings.Development.json
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# Project specific
+LUPIAN_Activity.zip
+msbuild.binlog
