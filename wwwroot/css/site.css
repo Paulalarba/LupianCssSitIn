@@ -2,6 +2,23 @@ html {
   font-size: 14px;
 }
 
+:root {
+  color-scheme: light;
+  --ccs-primary: oklch(38% 0.12 258);
+  --ccs-primary-strong: oklch(29% 0.11 258);
+  --ccs-secondary: oklch(62% 0.12 184);
+  --ccs-accent: oklch(78% 0.14 82);
+  --ccs-danger: oklch(57% 0.18 27);
+  --ccs-success: oklch(58% 0.13 154);
+  --ccs-warning: oklch(72% 0.14 72);
+  --ccs-surface: oklch(98% 0.006 250);
+  --ccs-surface-raised: oklch(100% 0.004 250);
+  --ccs-border: oklch(89% 0.018 250);
+  --ccs-text: oklch(24% 0.035 250);
+  --ccs-muted: oklch(48% 0.032 250);
+  --ccs-focus: color-mix(in oklch, var(--ccs-secondary) 35%, transparent);
+}
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;
@@ -9,7 +26,7 @@ html {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  box-shadow: 0 0 0 0.1rem var(--ccs-surface-raised), 0 0 0 0.25rem var(--ccs-focus);
 }
 
 html {
@@ -19,6 +36,8 @@ html {
 
 body {
   margin-bottom: 60px;
+  background: var(--ccs-surface);
+  color: var(--ccs-text);
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -32,18 +51,32 @@ body {
 
 /* Footer text color - lighter for better visibility */
 footer.footer {
-  color: #d0d0d0 !important;
-  background-color: rgba(26, 26, 46, 0.95);
+  color: oklch(88% 0.01 250) !important;
+  background-color: var(--ccs-primary-strong);
 }
 
 footer.footer a {
-  color: #FFB81C !important;
+  color: var(--ccs-accent) !important;
   font-weight: 600;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 footer.footer a:hover {
-  color: #FFD54F !important;
+  color: oklch(88% 0.12 84) !important;
   text-decoration: underline;
+}
+
+.btn-primary {
+  background-color: var(--ccs-primary);
+  border-color: var(--ccs-primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--ccs-primary-strong);
+  border-color: var(--ccs-primary-strong);
+}
+
+.text-muted {
+  color: var(--ccs-muted) !important;
 }

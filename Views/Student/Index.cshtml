@@ -27,23 +27,23 @@
         }
 
         :root {
-            --uc-navy: #003087;
-            --uc-navy-dark: #001a4d;
-            --uc-navy-light: #0d4298;
-            --uc-gold: #FFB81C;
-            --uc-gold-light: #ffc84d;
-            --uc-gold-dark: #d9940f;
-            --text-white: #ffffff;
-            --text-light: #e8e8e8;
-            --text-muted: #b0b0b0;
-            --text-dark: #1a1a1a;
-            --bg-dark: #0f0f23;
-            --bg-form: #1a1a2e;
-            --bg-input: #262641;
-            --border-input: #3d3d5c;
+            --uc-navy: oklch(38% 0.12 258);
+            --uc-navy-dark: oklch(26% 0.105 258);
+            --uc-navy-light: oklch(44% 0.12 258);
+            --uc-gold: oklch(78% 0.14 82);
+            --uc-gold-light: oklch(83% 0.13 82);
+            --uc-gold-dark: oklch(66% 0.13 72);
+            --text-white: oklch(98% 0.006 250);
+            --text-light: oklch(90% 0.008 250);
+            --text-muted: oklch(72% 0.01 250);
+            --text-dark: oklch(24% 0.025 250);
+            --bg-dark: oklch(20% 0.04 270);
+            --bg-form: oklch(24% 0.035 270);
+            --bg-input: oklch(30% 0.035 270);
+            --border-input: oklch(40% 0.035 270);
             --focus-gold: rgba(255, 184, 28, 0.3);
-            --success-color: #4ade80;
-            --danger-color: #f87171;
+            --success-color: oklch(72% 0.16 154);
+            --danger-color: oklch(69% 0.16 25);
         }
 
         html, body {
@@ -58,24 +58,33 @@
         body {
             display: flex;
             flex-direction: column;
+            position: fixed;
+            inset: 0;
+        }
+
+        /* Background image layer — only this gets dimmed, not the content */
+        body::before {
+            content: '';
             position: absolute;
             inset: 0;
             background: url('https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1400&auto=format&fit=crop&q=80');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
-            filter: brightness(0.6) saturate(1.1);
+            filter: brightness(0.45) saturate(1.1);
+            z-index: 0;
+            pointer-events: none;
         }
 
-        body::before {
+        /* Gradient overlay on top of background */
+        body::after {
             content: '';
             position: absolute;
             inset: 0;
             background: linear-gradient(
                 135deg,
-                rgba(0, 26, 77, 0.75) 0%,
-                rgba(0, 48, 135, 0.65) 35%,
-                rgba(13, 66, 152, 0.7) 100%
+                rgba(0, 26, 77, 0.70) 0%,
+                rgba(0, 48, 135, 0.55) 35%,
+                rgba(13, 66, 152, 0.65) 100%
             );
             z-index: 0;
             pointer-events: none;
@@ -86,8 +95,8 @@
         /* ════════════════════════════════════════════════════════════ */
         .auth-container {
             display: flex;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
             position: relative;
             z-index: 1;
@@ -105,24 +114,6 @@
             padding: clamp(2rem, 4vw, 4rem) clamp(2rem, 5vw, 3.5rem);
             min-height: 100vh;
             overflow: hidden;
-        }
-
-        /* Background with animated gradient overlay */
-        .hero-panel::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: transparent;
-            z-index: 0;
-        }
-
-        /* Enhanced gradient overlay with more depth */
-        .hero-panel::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: transparent;
-            z-index: 1;
         }
 
         .hero-panel > * {
@@ -216,25 +207,21 @@
             font-size: clamp(2.4rem, 6vw, 3.5rem);
             font-weight: 800;
             line-height: 1.1;
-            color: #ffffff;
+            color: oklch(98% 0.006 250);
             text-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
             letter-spacing: -0.02em;
             word-spacing: 0.05em;
         }
 
         .hero-content h1 .highlight {
-            color: #FFD54F;
+            color: oklch(86% 0.13 84);
             display: block;
-            background: linear-gradient(135deg, #FFD54F 0%, #FFEB3B 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .hero-content p {
             font-size: clamp(1rem, 2.2vw, 1.1rem);
             line-height: 1.8;
-            color: #ffffff;
+            color: oklch(98% 0.006 250);
             max-width: 480px;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
             font-weight: 400;
@@ -280,7 +267,7 @@
         /* Footer on hero */
         .hero-footer {
             font-size: 0.68rem;
-            color: #FFD54F;
+            color: oklch(86% 0.13 84);
             letter-spacing: 0.08em;
             text-transform: uppercase;
             font-weight: 600;
@@ -292,15 +279,15 @@
         /* ════════════════════════════════════════════════════════════ */
         .form-panel {
             width: clamp(350px, 100%, 440px);
-            flex-shrink: 1;
+            flex-shrink: 0;
             background: transparent;
             overflow-y: auto;
             overflow-x: hidden;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             padding: clamp(1.5rem, 3vw, 2.5rem);
-            min-height: 100vh;
+            height: 100%;
             position: relative;
             min-width: 280px;
         }
@@ -333,6 +320,7 @@
             animation: slideInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
             position: relative;
             z-index: 1;
+            margin: auto 0;
         }
 
         @@keyframes slideInUp {
@@ -371,19 +359,15 @@
             font-family: 'Syne', serif;
             font-size: 2rem;
             font-weight: 800;
-            color: #ffffff;
+            color: oklch(98% 0.006 250);
             line-height: 1.1;
             margin-bottom: 0.6rem;
             letter-spacing: -0.01em;
-            background: linear-gradient(135deg, #ffffff 0%, #FFD54F 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .form-subtitle {
             font-size: 0.93rem;
-            color: #e8e8e8;
+            color: oklch(90% 0.008 250);
             line-height: 1.6;
             margin: 0;
             font-weight: 400;
@@ -398,7 +382,7 @@
             display: block;
             font-size: 0.76rem;
             font-weight: 700;
-            color: #e8e8e8;
+            color: oklch(90% 0.008 250);
             margin-bottom: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.07em;
@@ -426,7 +410,7 @@
             background: linear-gradient(135deg, rgba(38, 38, 65, 0.95) 0%, rgba(61, 61, 92, 0.7) 100%);
             border: 1.5px solid rgba(255, 184, 28, 0.15);
             border-radius: 10px;
-            color: #ffffff;
+            color: oklch(98% 0.006 250);
             font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
             padding: 1rem 1.2rem 1rem 3.2rem;
@@ -472,12 +456,12 @@
             align-items: center;
             gap: 0.7rem;
             cursor: pointer;
-            color: #d0d0d0;
+            color: oklch(84% 0.01 250);
             transition: all 0.3s ease;
         }
 
         .remember-me:hover {
-            color: #ffffff;
+            color: oklch(98% 0.006 250);
         }
 
         .remember-me input[type="checkbox"] {
@@ -588,7 +572,7 @@
             text-align: center;
             margin-top: 1.8rem;
             font-size: 0.93rem;
-            color: #d0d0d0;
+            color: oklch(84% 0.01 250);
         }
 
         .signup-prompt a {
@@ -637,14 +621,14 @@
         .alert-success {
             background: rgba(76, 222, 128, 0.12);
             border: 1px solid rgba(76, 222, 128, 0.35);
-            color: #86efac;
+            color: oklch(84% 0.14 154);
             box-shadow: 0 0 20px rgba(76, 222, 128, 0.1);
         }
 
         .alert-danger {
             background: rgba(248, 113, 113, 0.12);
             border: 1px solid rgba(248, 113, 113, 0.35);
-            color: #fca5a5;
+            color: oklch(78% 0.12 25);
             box-shadow: 0 0 20px rgba(248, 113, 113, 0.1);
         }
 
@@ -655,11 +639,11 @@
             gap: 1.4rem;
             margin-top: 2rem;
             font-size: 0.72rem;
-            color: #b0b0b0;
+            color: oklch(72% 0.01 250);
         }
 
         .form-footer a {
-            color: #b0b0b0;
+            color: oklch(72% 0.01 250);
             text-decoration: none;
             transition: all 0.3s ease;
             font-weight: 500;
@@ -674,133 +658,88 @@
         }
 
         /* ════════════════════════════════════════════════════════════ */
-        /* RESPONSIVE DESIGN                                            */
+        /* RESPONSIVE — All screen sizes                                */
         /* ════════════════════════════════════════════════════════════ */
+
+        /* Large desktops / wide monitors (≥1600px) */
+        @@media (min-width: 1600px) {
+            .hero-content h1 { font-size: 4rem; }
+            .hero-content p  { font-size: 1.15rem; }
+            .form-panel      { width: 480px; }
+            .form-card       { max-width: 420px; padding: 3rem; }
+        }
+
+        /* Standard desktops (1200px – 1599px) */
         @@media (max-width: 1200px) {
-            .hero-panel {
-                padding: clamp(1.5rem, 3vw, 3rem) clamp(1.5rem, 4vw, 2.5rem);
-            }
-
-            .hero-content h1 {
-                font-size: clamp(2rem, 5vw, 2.8rem);
-            }
-
-            .form-panel {
-                width: clamp(320px, 95vw, 400px);
-            }
-
-            .form-card {
-                max-width: clamp(280px, 90vw, 360px);
-            }
+            .hero-panel { padding: 2.5rem; }
+            .hero-content h1 { font-size: clamp(2rem, 4.5vw, 3rem); }
+            .form-panel { width: clamp(320px, 38vw, 420px); }
+            .form-card  { max-width: 100%; }
         }
 
+        /* Tablets / small laptops (≤1024px) — hide hero, centre form */
         @@media (max-width: 1024px) {
-            .hero-panel {
-                display: none;
-            }
-
+            .hero-panel  { display: none; }
+            .auth-container { justify-content: center; }
             .form-panel {
                 width: 100%;
-                background: transparent;
                 min-width: unset;
+                padding: 2rem 1.5rem;
             }
-
-            .auth-container {
-                justify-content: center;
+            .form-card {
+                max-width: min(440px, 94vw);
+                margin: auto;
             }
         }
 
+        /* Portrait tablets / large phones (≤768px) */
         @@media (max-width: 768px) {
-            .auth-container {
-                flex-direction: column;
-            }
-
-            .form-panel {
-                width: 100%;
-                height: 100vh;
-                padding: clamp(1.5rem, 3vw, 2rem);
-            }
-
-            .form-card {
-                max-width: 100%;
-                padding: clamp(1.5rem, 3vw, 2rem);
-            }
-
-            .form-title {
-                font-size: 1.7rem;
-            }
-
-            .meta-row {
-                flex-direction: column;
-                gap: 1.2rem;
-                align-items: flex-start;
-            }
-
-            .forgot-password {
-                align-self: flex-start;
-            }
+            .form-panel { padding: 1.5rem 1rem; }
+            .form-card  { padding: 1.75rem 1.5rem; border-radius: 16px; }
+            .form-title { font-size: 1.7rem; }
+            .meta-row   { flex-direction: column; gap: 0.9rem; align-items: flex-start; }
         }
 
+        /* Phones (≤480px) */
         @@media (max-width: 480px) {
-            .form-panel {
-                padding: clamp(1rem, 2vw, 1.5rem);
-            }
-
-            .form-card {
-                padding: clamp(1.25rem, 2.5vw, 1.5rem);
-            }
-
-            .form-title {
-                font-size: 1.5rem;
-            }
-
-            .form-badge {
-                font-size: 0.68rem;
-                padding: 0.45rem 1rem;
-            }
-
-            .btn-signin {
-                font-size: 0.92rem;
-                padding: 1rem;
-            }
+            .form-panel  { padding: 1rem 0.75rem; }
+            .form-card   { padding: 1.5rem 1.25rem; border-radius: 14px; }
+            .form-title  { font-size: 1.5rem; }
+            .form-badge  { font-size: 0.68rem; padding: 0.4rem 0.9rem; }
+            .form-subtitle { font-size: 0.86rem; }
+            .btn-signin  { font-size: 0.9rem; padding: 0.9rem; }
+            .form-group  { margin-bottom: 1.2rem; }
+            .form-group input { padding: 0.85rem 1rem 0.85rem 2.8rem; font-size: 0.9rem; }
+            .form-label  { font-size: 0.7rem; }
+            .signup-prompt { font-size: 0.85rem; }
         }
 
-        /* Extra small screens and zoom-out states */
-        @@media (max-width: 350px) or (max-height: 600px) {
-            .form-panel {
-                padding: 1rem;
-                min-height: auto;
-            }
+        /* Small phones (≤360px) */
+        @@media (max-width: 360px) {
+            .form-panel  { padding: 0.75rem; }
+            .form-card   { padding: 1.25rem 1rem; border-radius: 12px; }
+            .form-title  { font-size: 1.35rem; }
+            .form-badge  { font-size: 0.63rem; padding: 0.35rem 0.8rem; }
+            .btn-signin  { font-size: 0.85rem; padding: 0.8rem; }
+        }
 
-            .form-card {
-                padding: 1.25rem;
-            }
-
-            .form-title {
-                font-size: 1.3rem;
-            }
-
-            .hero-accent {
-                margin-top: 0.5rem;
-            }
+        /* Very short screens (landscape phones) */
+        @@media (max-height: 600px) {
+            .form-header { margin-bottom: 1.2rem; }
+            .form-group  { margin-bottom: 1rem; }
+            .meta-row    { margin-bottom: 1rem; }
+            .form-group input { padding: 0.75rem 1rem 0.75rem 2.8rem; }
         }
 
         /* Scrollbar styling */
-        .form-panel::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .form-panel::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
+        .form-panel::-webkit-scrollbar { width: 6px; }
+        .form-panel::-webkit-scrollbar-track { background: transparent; }
         .form-panel::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, rgba(255, 184, 28, 0.3) 0%, rgba(255, 184, 28, 0.15) 100%);
+            background: linear-gradient(180deg, rgba(255,184,28,0.35) 0%, rgba(255,184,28,0.15) 100%);
             border-radius: 4px;
         }
-
         .form-panel::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, rgba(255, 184, 28, 0.4) 0%, rgba(255, 184, 28, 0.25) 100%);
+            background: rgba(255,184,28,0.5);
         }
     </style>
 </head>
@@ -871,7 +810,7 @@
                             <input asp-for="IdNumber" type="text" placeholder="e.g. 23-XXX-XXX" autocomplete="username" value="@Model?.IdNumber" />
                             <span class="input-icon">🪪</span>
                         </div>
-                        <span asp-validation-for="IdNumber" style="display:block; margin-top:0.4rem; color: #fca5a5; font-size: 0.75rem;"></span>
+                        <span asp-validation-for="IdNumber" style="display:block; margin-top:0.4rem; color: oklch(78% 0.12 25); font-size: 0.75rem;"></span>
                     </div>
 
                     <!-- Password -->
@@ -881,7 +820,7 @@
                             <input asp-for="Password" type="password" placeholder="Enter your password" autocomplete="current-password" />
                             <span class="input-icon">🔒</span>
                         </div>
-                        <span asp-validation-for="Password" style="display:block; margin-top:0.4rem; color: #fca5a5; font-size: 0.75rem;"></span>
+                        <span asp-validation-for="Password" style="display:block; margin-top:0.4rem; color: oklch(78% 0.12 25); font-size: 0.75rem;"></span>
                     </div>
 
                     <!-- Meta row -->

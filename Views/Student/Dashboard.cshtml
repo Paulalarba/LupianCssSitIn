@@ -50,18 +50,18 @@
         }
 
         :root {
-            --primary-blue: #0F3D91;
-            --primary-dark: #082654;
-            --accent-yellow: #F4B400;
-            --light-bg: #F5F7FB;
-            --card-bg: #FFFFFF;
-            --text-dark: #1E293B;
-            --text-muted: #64748B;
-            --border-light: #E2E8F0;
-            --success-green: #10B981;
-            --warning-orange: #F59E0B;
-            --danger-red: #EF4444;
-            --info-blue: #3B82F6;
+            --primary-blue: oklch(38% 0.12 258);
+            --primary-dark: oklch(29% 0.11 258);
+            --accent-yellow: oklch(78% 0.14 82);
+            --light-bg: oklch(97% 0.01 250);
+            --card-bg: oklch(100% 0.004 250);
+            --text-dark: oklch(24% 0.035 250);
+            --text-muted: oklch(48% 0.032 250);
+            --border-light: oklch(89% 0.018 250);
+            --success-green: oklch(58% 0.13 154);
+            --warning-orange: oklch(72% 0.14 72);
+            --danger-red: oklch(57% 0.18 27);
+            --info-blue: oklch(59% 0.14 244);
         }
 
         body {
@@ -318,7 +318,7 @@
             width: 36px;
             height: 36px;
             border-radius: 10px;
-            background: linear-gradient(135deg, var(--accent-yellow), #FFD54F);
+            background: linear-gradient(135deg, var(--accent-yellow), oklch(86% 0.13 84));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -369,7 +369,7 @@
         }
 
         .welcome-banner {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #1a5fbf 100%);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, oklch(45% 0.13 248) 100%);
             border-radius: 16px;
             padding: 2rem;
             margin-bottom: 2rem;
@@ -610,7 +610,8 @@
         .announcement-item {
             padding: 1rem;
             background: var(--light-bg);
-            border-left: 4px solid var(--primary-blue);
+            border: 1px solid var(--border-light);
+            box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary-blue) 18%, transparent);
             border-radius: 8px;
             transition: all 0.3s ease;
         }
@@ -621,7 +622,7 @@
         }
 
         .announcement-item.important {
-            border-left-color: var(--warning-orange);
+            box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--warning-orange) 32%, transparent);
             background: rgba(245, 158, 11, 0.05);
         }
 
@@ -721,7 +722,7 @@
 
         .chart-bar {
             flex: 1;
-            background: linear-gradient(180deg, var(--primary-blue), #1a5fbf);
+            background: linear-gradient(180deg, var(--primary-blue), oklch(45% 0.13 248));
             border-radius: 8px 8px 0 0;
             position: relative;
             transition: all 0.3s ease;
@@ -730,12 +731,12 @@
         }
 
         .chart-bar:hover {
-            background: linear-gradient(180deg, var(--accent-yellow), #FFD54F);
+            background: linear-gradient(180deg, var(--accent-yellow), oklch(86% 0.13 84));
             transform: scaleY(1.05);
         }
 
         .chart-bar.highlight {
-            background: linear-gradient(180deg, var(--accent-yellow), #FFD54F);
+            background: linear-gradient(180deg, var(--accent-yellow), oklch(86% 0.13 84));
         }
 
         /* NOTIFICATIONS LIST */
@@ -985,7 +986,8 @@
         .session-item, .reward-item, .rule-item {
             padding: 1rem;
             background: var(--light-bg);
-            border-left: 4px solid var(--primary-blue);
+            border: 1px solid var(--border-light);
+            box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary-blue) 18%, transparent);
             border-radius: 8px;
             margin-bottom: 1rem;
         }
@@ -1218,7 +1220,7 @@
                         <div class="stat-card-value" id="display-rewards-points">100</div>
                         <div class="stat-card-subtitle">Loyalty points earned</div>
                         <div class="progress-bar">
-                            <div class="progress-fill" id="display-rewards-progress" style="width: 10%; background: linear-gradient(90deg, var(--accent-yellow), #FFD54F);"></div>
+                            <div class="progress-fill" id="display-rewards-progress" style="width: 10%; background: linear-gradient(90deg, var(--accent-yellow), oklch(86% 0.13 84));"></div>
                         </div>
                         <div class="progress-text">
                             <span>To Silver Tier</span>
@@ -1547,15 +1549,15 @@
                 </div>
                 
                 <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 0.95rem; font-weight: 700; color: var(--text-dark);">Loyalty Reward Milestones</h3>
-                <div class="reward-item" style="border-left-color: var(--success-green);">
+                <div class="reward-item" style="box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--success-green) 32%, transparent);">
                     <h4>🥉 Bronze Tier (0 - 500 points)</h4>
                     <p>Benefits: Access to all public computer stations and basic priority booking lines.</p>
                 </div>
-                <div class="reward-item" style="border-left-color: var(--info-blue);">
+                <div class="reward-item" style="box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--info-blue) 32%, transparent);">
                     <h4>🥈 Silver Tier (501 - 1000 points)</h4>
                     <p>Benefits: Double checkout points multiplier, access to multimedia labs on weekends.</p>
                 </div>
-                <div class="reward-item" style="border-left-color: var(--accent-yellow);">
+                <div class="reward-item" style="box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent-yellow) 32%, transparent);">
                     <h4>🏆 Gold Tier (1001 - 2000 points)</h4>
                     <p>Benefits: Early event booking priority, invitations to technical coding bootcamp bootcamps.</p>
                 </div>
@@ -1591,7 +1593,7 @@
             </div>
             <div class="modal-body">
                 <p>Welcome to the College of Computer Studies Laboratory Portal! You are already viewing your main dashboard overview workspace.</p>
-                <div style="background: var(--light-bg); border-left: 4px solid var(--primary-blue); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                <div style="background: var(--light-bg); border: 1px solid var(--border-light); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary-blue) 18%, transparent); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
                     <strong style="display: block; margin-bottom: 0.5rem;">Quick Navigation Guide:</strong>
                     <ul style="padding-left: 1.25rem; font-size: 0.8rem; line-height: 1.5; color: var(--text-muted);">
                         <li>Click "My Account Profile" to upload custom avatar photos.</li>
@@ -1876,8 +1878,8 @@
             });
         }
 
-        // Submit feedback to localStorage queue
-        function handleFeedbackSubmit(e) {
+        // Submit feedback to the database, with the local queue kept as a UI fallback.
+        async function handleFeedbackSubmit(e) {
             e.preventDefault();
             const category = document.getElementById('feedbackCategory').value;
             const subject = document.getElementById('feedbackSubject').value.trim();
@@ -1898,7 +1900,23 @@
             list.unshift(newFeed);
             localStorage.setItem('admin_feedbacks', JSON.stringify(list));
 
-            alert('Your lab feedback was successfully sent! The administrator will review and resolve it.');
+            try {
+                const res = await fetch('/Student/SubmitFeedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        studentId: studentId,
+                        rating: rating,
+                        comments: `${category}: ${subject} - ${message}`
+                    })
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message);
+                alert('Your lab feedback was successfully saved. The administrator will review it.');
+            } catch (err) {
+                alert('Feedback was saved locally for this browser, but the database record could not be created: ' + err.message);
+            }
+
             e.target.reset();
             
             // Reset stars selector to 5
@@ -1909,8 +1927,8 @@
             syncStudentDashboardState();
         }
 
-        // Submit reservation to localStorage queue
-        function handleReservationSubmit(e) {
+        // Submit reservation to the database, with the local queue kept for instant dashboard feedback.
+        async function handleReservationSubmit(e) {
             e.preventDefault();
             const room = document.getElementById('labRoom').value;
             const pc = document.getElementById('pcNumber').value;
@@ -1940,7 +1958,28 @@
             reservationsList.unshift(newRes);
             localStorage.setItem('admin_reservations', JSON.stringify(reservationsList));
 
-            alert(`Reservation requested successfully! Lab Room ${room} PC Unit #${pc} is now pending admin approval.`);
+            try {
+                const res = await fetch('/Student/CreateReservation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        studentId: studentId,
+                        labName: `Lab Room ${room}`,
+                        reservationDate: date,
+                        startTime: `${start}:00`,
+                        endTime: `${end}:00`,
+                        purpose: 'Laboratory reservation',
+                        seatNumber: `PC-${pc.padStart(2, '0')}`,
+                        notes: notes
+                    })
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message);
+                alert(`Reservation requested successfully! Lab Room ${room} PC Unit #${pc} is now pending admin approval.`);
+            } catch (err) {
+                alert('Reservation was saved locally for this browser, but the database record could not be created: ' + err.message);
+            }
+
             e.target.reset();
 
             closeModal('reservation-modal');
@@ -1961,9 +2000,48 @@
             });
         });
 
+        async function loadServerDashboardData() {
+            if (!studentId) return;
+
+            try {
+                const res = await fetch(`/Student/GetDashboardData?studentId=${encodeURIComponent(studentId)}`);
+                const data = await res.json();
+                if (!data.success) return;
+
+                if (data.student) {
+                    document.getElementById('display-remaining-sessions').textContent = data.student.remainingSessions;
+                    document.getElementById('display-rewards-points').textContent = data.student.rewardPoints.toLocaleString();
+                    document.getElementById('display-active-reservations-count').textContent = data.reservations.length;
+
+                    const pct = Math.max(0, Math.min(100, Math.round((data.student.remainingSessions / data.student.totalSessions) * 100)));
+                    document.getElementById('display-remaining-progress').style.width = `${pct}%`;
+                    document.getElementById('display-remaining-percent').textContent = `${pct}%`;
+                }
+
+                const announcements = document.getElementById('display-announcements-list');
+                if (announcements && data.announcements.length > 0) {
+                    announcements.innerHTML = '';
+                    data.announcements.slice(0, 3).forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'announcement-item';
+                        div.innerHTML = `
+                            <div class="announcement-badge">${item.audience}</div>
+                            <div class="announcement-title">${item.title}</div>
+                            <div class="announcement-desc">${item.content}</div>
+                            <div class="announcement-date">${new Date(item.createdAt).toLocaleDateString()}</div>
+                        `;
+                        announcements.appendChild(div);
+                    });
+                }
+            } catch {
+                // Keep the localStorage-driven dashboard usable when the server is offline.
+            }
+        }
+
         // Initialize and sync State on load
         document.addEventListener('DOMContentLoaded', function() {
             syncStudentDashboardState();
+            loadServerDashboardData();
 
             // Restrict reservation date selector to today or ahead
             const dateInput = document.getElementById('reservationDate');

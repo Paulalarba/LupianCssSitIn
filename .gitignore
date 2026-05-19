@@ -26,6 +26,10 @@ appsettings.Development.json
 *.db-shm
 *.db-wal
 
+# NuGet / .NET SDK caches (never commit these)
+.nuget/
+.dotnet/
+
 # Project specific
 LUPIAN_Activity.zip
 msbuild.binlog

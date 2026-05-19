@@ -1,1687 +1,821 @@
 @model CCSMonitoringSystem.Models.Student
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-user-select: text;
-  }
-
-  input, textarea, select {
-    -webkit-user-select: text;
-    user-select: text;
-  }
-
-  :root {
-    --uc-navy: #003087;
-    --uc-navy-dark: #001a4d;
-    --uc-navy-light: #0d4298;
-    --uc-gold: #FFB81C;
-    --uc-gold-light: #ffc84d;
-    --uc-gold-dark: #d9940f;
-    --text-white: #ffffff;
-    --text-light: #e8e8e8;
-    --text-muted: #b0b0b0;
-    --text-dark: #1a1a1a;
-    --bg-dark: #0f0f23;
-    --bg-form: #1a1a2e;
-    --bg-input: #262641;
-    --border-input: #3d3d5c;
-    --focus-gold: rgba(255, 184, 28, 0.3);
-    --success-color: #4ade80;
-    --danger-color: #f87171;
-  }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    overflow: hidden;
-  }
-
-  body {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    inset: 0;
-    background: url('https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1400&auto=format&fit=crop&q=80');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    filter: brightness(0.6) saturate(1.1);
-  }
-
-  body::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(0, 26, 77, 0.75) 0%,
-      rgba(0, 48, 135, 0.65) 35%,
-      rgba(13, 66, 152, 0.7) 100%
-    );
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  /* ════════════════════════════════════════════════════════════ */
-  /* MAIN CONTAINER                                               */
-  /* ════════════════════════════════════════════════════════════ */
-  .auth-wrapper {
-    display: flex;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ════════════════════════════════════════════════════════════ */
-  /* HERO PANEL - LEFT                                            */
-  /* ════════════════════════════════════════════════════════════ */
-  .left-panel {
-    flex: 1;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: clamp(2rem, 4vw, 4rem) clamp(2rem, 5vw, 3.5rem);
-    min-height: 100vh;
-    overflow: hidden;
-  }
-
-  .left-panel::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: transparent;
-    z-index: 0;
-  }
-
-  .left-panel::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: transparent;
-    z-index: 1;
-  }
-
-  .left-panel > * {
-    position: relative;
-    z-index: 2;
-  }
-
-  /* Logo treatment with enhanced styling */
-  .brand-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.85rem;
-    background: rgba(255, 255, 255, 0.09);
-    backdrop-filter: blur(20px);
-    border: 1.5px solid rgba(255, 184, 28, 0.3);
-    border-radius: 14px;
-    padding: 0.8rem 1.3rem;
-    width: fit-content;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  }
-
-  .brand-badge:hover {
-    background: rgba(255, 255, 255, 0.14);
-    border-color: rgba(255, 184, 28, 0.5);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(255, 184, 28, 0.15);
-  }
-
-  .brand-badge .logo-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, var(--uc-gold) 0%, var(--uc-gold-light) 100%);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Syne', serif;
-    font-weight: 800;
-    font-size: 0.68rem;
-    color: var(--uc-navy-dark);
-    line-height: 1;
-    letter-spacing: -0.02em;
-    box-shadow: 0 4px 16px rgba(255, 184, 28, 0.3);
-  }
-
-  .brand-badge .brand-name {
-    font-family: 'Syne', serif;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--text-white);
-    letter-spacing: 0.02em;
-  }
-
-  .brand-badge .brand-sub {
-    font-size: 0.62rem;
-    font-weight: 600;
-    color: var(--uc-gold);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  /* Hero content with enhanced typography */
-  .hero-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 2rem;
-    animation: fadeInUp 0.8s ease-out 0.2s both;
-  }
-
-  @@keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .new-student-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: linear-gradient(135deg, rgba(255, 184, 28, 0.15) 0%, rgba(255, 184, 28, 0.08) 100%);
-    border: 1px solid rgba(255, 184, 28, 0.35);
-    color: var(--uc-gold);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    padding: 0.5rem 1.1rem;
-    border-radius: 24px;
-    margin-bottom: 1.2rem;
-    box-shadow: 0 4px 12px rgba(255, 184, 28, 0.1);
-    width: fit-content;
-  }
-
-  .hero-content h1 {
-    font-family: 'Syne', serif;
-    font-size: clamp(2.4rem, 6vw, 3.5rem);
-    font-weight: 800;
-    line-height: 1.1;
-    color: #ffffff;
-    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
-    letter-spacing: -0.02em;
-    word-spacing: 0.05em;
-  }
-
-  .hero-content h1 .highlight {
-    color: #FFD54F;
-    display: block;
-    background: linear-gradient(135deg, #FFD54F 0%, #FFEB3B 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .hero-content p {
-    font-size: clamp(1rem, 2.2vw, 1.1rem);
-    line-height: 1.8;
-    color: #ffffff;
-    max-width: 480px;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-    font-weight: 400;
-    letter-spacing: 0.01em;
-  }
-
-  /* Footer on hero */
-  .left-footer {
-    font-size: 0.68rem;
-    color: #FFD54F;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-  }
-
-  /* ════════════════════════════════════════════════════════════ */
-  /* FORM PANEL - RIGHT                                           */
-  /* ════════════════════════════════════════════════════════════ */
-  .right-panel {
-    width: clamp(350px, 100%, 440px);
-    flex-shrink: 1;
-    background: transparent;
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(1.5rem, 3vw, 2.5rem);
-    min-height: 100vh;
-    position: relative;
-    min-width: 280px;
-  }
-
-  /* Decorative background elements */
-  .right-panel::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(255, 184, 28, 0.08) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
-  /* Form wrapper with enhanced card effect */
-  .form-box {
-    width: 100%;
-    max-width: clamp(300px, 90vw, 380px);
-    background: rgba(15, 15, 35, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 184, 28, 0.15);
-    border-radius: 20px;
-    padding: clamp(1.5rem, 3vw, 2.5rem);
-    box-shadow: 
-      0 25px 50px rgba(0, 0, 0, 0.7),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    animation: slideInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    position: relative;
-    z-index: 1;
-  }
-
-  @@keyframes slideInUp {
-    from {
-      opacity: 0;
-      transform: translateY(32px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* CREATE ACCOUNT badge */
-  .page-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, rgba(255, 184, 28, 0.15) 0%, rgba(255, 184, 28, 0.08) 100%);
-    border: 1px solid rgba(255, 184, 28, 0.35);
-    color: var(--uc-gold);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    padding: 0.5rem 1.1rem;
-    border-radius: 24px;
-    margin-bottom: 1.2rem;
-    box-shadow: 0 4px 12px rgba(255, 184, 28, 0.1);
-  }
-
-  .form-title {
-    font-family: 'Syne', serif;
-    font-size: 2rem;
-    font-weight: 800;
-    color: #ffffff;
-    line-height: 1.1;
-    margin-bottom: 0.6rem;
-    letter-spacing: -0.01em;
-    background: linear-gradient(135deg, #ffffff 0%, #FFD54F 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .form-sub {
-    font-size: 0.93rem;
-    color: #e8e8e8;
-    margin-bottom: 1.8rem;
-    line-height: 1.6;
-    font-weight: 400;
-  }
-
-  /* ── Form Grid ── */
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.85rem;
-    margin-bottom: 1rem;
-  }
-
-  .form-grid.full { grid-template-columns: 1fr; }
-
-  /* ── Form Fields ── */
-  .field-group { 
-    margin-bottom: 1.2rem;
-    position: relative;
-    animation: fadeIn 0.4s ease-out both;
-  }
-
-  @@keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .field-label {
-    display: flex;
-    align-items: center;
-    font-size: 0.76rem;
-    font-weight: 700;
-    color: #e8e8e8;
-    margin-bottom: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    transition: color 0.3s ease;
-  }
-
-  .field-label:hover {
-    color: var(--uc-gold);
-  }
-
-  .field-label .optional-badge {
-    font-size: 0.65rem;
-    color: #a0a0a0;
-    font-weight: 400;
-    text-transform: lowercase;
-    letter-spacing: 0;
-    margin-left: 6px;
-    transition: color 0.3s ease;
-  }
-
-  .field-label:hover .optional-badge {
-    color: #d0d0d0;
-  }
-
-  .input-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
-  .input-wrap input,
-  .input-wrap select {
-    width: 100%;
-    background: linear-gradient(135deg, rgba(38, 38, 65, 0.95) 0%, rgba(61, 61, 92, 0.7) 100%);
-    border: 1.5px solid rgba(255, 184, 28, 0.15);
-    border-radius: 10px;
-    color: #ffffff;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.95rem;
-    padding: 1rem 1.2rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(4px);
-    position: relative;
-    z-index: 1;
-  }
-
-  .input-wrap input::placeholder,
-  .input-wrap select::placeholder {
-    color: rgba(224, 224, 224, 0.5);
-  }
-
-  .input-wrap input:focus,
-  .input-wrap select:focus {
-    outline: none;
-    border-color: var(--uc-gold);
-    background: linear-gradient(135deg, rgba(38, 38, 65, 1) 0%, rgba(61, 61, 92, 0.7) 100%);
-    box-shadow: 
-      0 0 0 4px var(--focus-gold),
-      0 0 20px rgba(255, 184, 28, 0.2),
-      inset 0 1px 3px rgba(0, 0, 0, 0.3);
-  }
-
-  .input-wrap input:hover:not(:focus),
-  .input-wrap select:hover:not(:focus) {
-    border-color: rgba(255, 184, 28, 0.25);
-    background: linear-gradient(135deg, rgba(38, 38, 65, 0.95) 0%, rgba(61, 61, 92, 0.6) 100%);
-  }
-
-  /* Field validation spans */
-  .val-error {
-    display: block;
-    margin-top: 0.35rem;
-    color: #f87171;
-    font-size: 0.76rem;
-    animation: slideDown 0.3s ease-out;
-    font-weight: 500;
-  }
-
-  @@keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-5px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* ── File Upload ── */
-  .file-upload-wrapper {
-    margin-bottom: 0.5rem;
-  }
-
-  .file-upload-label {
-    display: block;
-    padding: 1.2rem;
-    border: 1.5px dashed rgba(255, 184, 28, 0.2);
-    border-radius: 10px;
-    text-align: center;
-    background: linear-gradient(135deg, rgba(38, 38, 65, 0.8) 0%, rgba(61, 61, 92, 0.6) 100%);
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .file-upload-label:hover {
-    border-color: rgba(255, 184, 28, 0.5);
-    background: linear-gradient(135deg, rgba(38, 38, 65, 0.95) 0%, rgba(61, 61, 92, 0.7) 100%);
-    box-shadow: 0 0 20px rgba(255, 184, 28, 0.15);
-  }
-
-  .file-upload-label input { display: none; }
-
-  .file-upload-text {
-    color: #d0d0d0;
-    font-size: 0.87rem;
-  }
-
-  .file-name {
-    color: var(--uc-gold);
-    font-weight: 600;
-    margin-top: 0.4rem;
-    font-size: 0.82rem;
-  }
-
-  /* ── Submit Button ── */
-  .btn-register {
-    width: 100%;
-    padding: 1.1rem;
-    background: linear-gradient(135deg, var(--uc-gold) 0%, var(--uc-gold-light) 100%);
-    border: none;
-    border-radius: 12px;
-    color: var(--uc-navy-dark);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.96rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 10px 30px rgba(255, 184, 28, 0.3);
-    position: relative;
-    overflow: hidden;
-    margin-top: 0.5rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.7rem;
-  }
-
-  .btn-register::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .btn-register:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(255, 184, 28, 0.4);
-  }
-
-  .btn-register:hover::before {
-    opacity: 1;
-  }
-
-  .btn-register:active {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(255, 184, 28, 0.3);
-  }
-
-  .btn-register:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  /* ── Alerts ── */
-  .alert-success-dark {
-    background: rgba(76, 222, 128, 0.12);
-    border: 1px solid rgba(76, 222, 128, 0.35);
-    color: #86efac;
-    border-radius: 10px;
-    padding: 1rem 1.2rem;
-    font-size: 0.87rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.9rem;
-    backdrop-filter: blur(4px);
-    box-shadow: 0 0 20px rgba(76, 222, 128, 0.1);
-  }
-
-  .alert-danger-dark {
-    background: rgba(248, 113, 113, 0.12);
-    border: 1px solid rgba(248, 113, 113, 0.35);
-    color: #fca5a5;
-    border-radius: 10px;
-    padding: 1rem 1.2rem;
-    font-size: 0.87rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.9rem;
-    backdrop-filter: blur(4px);
-    box-shadow: 0 0 20px rgba(248, 113, 113, 0.1);
-  }
-
-  .validation-summary {
-    background: rgba(248, 113, 113, 0.12);
-    border: 1px solid rgba(248, 113, 113, 0.35);
-    color: #fca5a5;
-    border-radius: 10px;
-    padding: 1rem 1.2rem;
-    font-size: 0.87rem;
-    margin-bottom: 1.5rem;
-    backdrop-filter: blur(4px);
-    box-shadow: 0 0 20px rgba(248, 113, 113, 0.1);
-  }
-
-  .validation-summary ul { margin: 0; padding-left: 1.4rem; }
-  .validation-summary li { margin-bottom: 0.35rem; }
-
-  .validation-summary strong {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 700;
-  }
-
-  /* ── Divider ── */
-  .or-divider {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 0.85rem;
-    color: #a0a0a0;
-    margin-bottom: 1.2rem;
-  }
-
-  .or-divider span {
-    flex: 1;
-    height: 1px;
-    background: rgba(255, 184, 28, 0.15);
-    display: block;
-  }
-
-  /* ── Login prompt ── */
-  .login-prompt {
-    text-align: center;
-    font-size: 0.93rem;
-    color: #d0d0d0;
-    margin-bottom: 1.8rem;
-  }
-
-  .login-prompt a {
-    color: var(--uc-gold);
-    text-decoration: none;
-    font-weight: 700;
-    transition: all 0.3s ease;
-  }
-
-  .login-prompt a:hover {
-    color: var(--uc-gold-light);
-  }
-
-  /* ── Footer links ── */
-  .page-footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 1.4rem;
-    margin-top: 1rem;
-    font-size: 0.72rem;
-    color: #b0b0b0;
-  }
-
-  .page-footer-links a {
-    color: #b0b0b0;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-weight: 500;
-  }
-
-  .page-footer-links a:hover {
-    color: var(--uc-gold);
-  }
-
-  /* ── Responsive ── */
-  @@media (max-width: 1200px) {
-    .left-panel {
-      padding: clamp(1.5rem, 3vw, 3rem) clamp(1.5rem, 4vw, 2.5rem);
+@{
+    Layout = null;
+    ViewData["Title"] = "Create Student Account";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>@ViewData["Title"] - UC CCS Portal</title>
+  <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --uc-blue-900: oklch(23% 0.095 258);
+      --uc-blue-800: oklch(30% 0.11 258);
+      --uc-blue-650: oklch(42% 0.13 258);
+      --uc-gold-500: oklch(79% 0.14 82);
+      --uc-gold-600: oklch(70% 0.14 76);
+      --ink-950: oklch(18% 0.035 270);
+      --ink-900: oklch(22% 0.035 270);
+      --ink-820: oklch(28% 0.035 270);
+      --ink-760: oklch(34% 0.034 270);
+      --text-strong: oklch(97% 0.006 250);
+      --text: oklch(88% 0.01 250);
+      --text-muted: oklch(70% 0.014 250);
+      --line: oklch(46% 0.04 270);
+      --danger: oklch(72% 0.16 25);
+      --success: oklch(76% 0.15 154);
+      --shadow: 0 26px 70px rgba(4, 10, 29, 0.48);
+      --radius: 8px;
+      --focus: color-mix(in oklch, var(--uc-gold-500) 38%, transparent);
     }
 
-    .hero-content h1 {
-      font-size: clamp(2rem, 5vw, 2.8rem);
+    * {
+      box-sizing: border-box;
     }
 
-    .right-panel {
-      width: clamp(320px, 95vw, 400px);
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
     }
 
-    .form-box {
-      max-width: clamp(280px, 90vw, 360px);
+    body {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        linear-gradient(90deg, rgba(4, 26, 70, 0.88), rgba(9, 56, 132, 0.72)),
+        url("https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1800&auto=format&fit=crop&q=82");
+      background-position: center;
+      background-size: cover;
+      overflow-x: hidden;
     }
-  }
 
-  @@media (max-width: 1024px) {
-    .left-panel {
-      display: none;
+    a {
+      color: var(--uc-gold-500);
+      font-weight: 700;
+      text-decoration: none;
     }
 
-    .right-panel {
+    a:hover {
+      color: oklch(86% 0.12 84);
+      text-decoration: underline;
+    }
+
+    .register-shell {
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(380px, 520px);
+      gap: clamp(1.5rem, 4vw, 4rem);
+      align-items: stretch;
+      padding: clamp(1rem, 2.4vw, 2.5rem);
+      position: relative;
+    }
+
+    .register-shell::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 18% 16%, rgba(255, 191, 54, 0.16), transparent 26rem),
+        linear-gradient(180deg, rgba(0, 12, 38, 0.12), rgba(0, 18, 50, 0.44));
+    }
+
+    .intro-panel,
+    .form-panel {
+      position: relative;
+      z-index: 1;
+    }
+
+    .intro-panel {
+      min-height: calc(100svh - clamp(2rem, 4.8vw, 5rem));
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      align-items: center;
+      max-width: 760px;
+      padding: clamp(0.5rem, 2vw, 2rem) 0;
+    }
+
+    .brand-mark {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid rgba(255, 191, 54, 0.32);
+      border-radius: var(--radius);
+      background: rgba(7, 36, 91, 0.66);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, var(--uc-gold-500), oklch(86% 0.11 88));
+      color: var(--uc-blue-900);
+      font-size: 0.66rem;
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: 0;
+      text-align: center;
+    }
+
+    .brand-text {
+      display: grid;
+      gap: 0.1rem;
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: var(--text-strong);
+    }
+
+    .brand-text span {
+      color: var(--uc-gold-500);
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .intro-copy {
+      max-width: 650px;
+      align-self: end;
+      padding-bottom: clamp(1.5rem, 5vh, 4rem);
+    }
+
+    .eyebrow {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-bottom: 1rem;
+      padding: 0.42rem 0.78rem;
+      border: 1px solid rgba(255, 191, 54, 0.38);
+      border-radius: 999px;
+      color: var(--uc-gold-500);
+      background: rgba(17, 33, 69, 0.62);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .intro-copy h1 {
+      max-width: 680px;
+      margin: 0 0 1rem;
+      color: var(--text-strong);
+      font-size: 3.8rem;
+      font-weight: 850;
+      line-height: 1.02;
+      letter-spacing: 0;
+      text-shadow: 0 14px 34px rgba(2, 8, 24, 0.52);
+    }
+
+    .intro-copy h1 span {
+      color: var(--uc-gold-500);
+      display: block;
+    }
+
+    .intro-copy p {
+      max-width: 56ch;
+      margin: 0;
+      color: var(--text);
+      font-size: 1.04rem;
+      line-height: 1.75;
+      text-shadow: 0 8px 20px rgba(2, 8, 24, 0.36);
+    }
+
+    .intro-footer {
+      color: oklch(82% 0.05 84);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .form-panel {
+      align-self: start;
       width: 100%;
-      background: transparent;
-      min-width: unset;
+      max-width: 520px;
+      justify-self: end;
+      padding-bottom: clamp(1rem, 3vh, 2rem);
     }
 
-    .auth-wrapper {
-      justify-content: center;
-    }
-  }
-
-  @@media (max-width: 768px) {
-    .auth-wrapper {
-      flex-direction: column;
-    }
-
-    .right-panel {
+    .form-card {
       width: 100%;
-      height: 100vh;
-      padding: clamp(1.5rem, 3vw, 2rem);
+      border: 1px solid rgba(255, 191, 54, 0.18);
+      border-radius: 12px;
+      background: color-mix(in oklch, var(--ink-950) 94%, transparent);
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
 
-    .form-box {
-      max-width: 100%;
-      padding: clamp(1.5rem, 3vw, 2rem);
+    .form-header,
+    .form-body,
+    .form-footer {
+      padding-inline: clamp(1.15rem, 3vw, 2rem);
     }
 
-    .form-title {
-      font-size: 1.7rem;
-    }
-
-    .form-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @@media (max-width: 480px) {
-    .right-panel {
-      padding: clamp(1rem, 2vw, 1.5rem);
-    }
-
-    .form-box {
-      padding: clamp(1.25rem, 2.5vw, 1.5rem);
-    }
-
-    .form-title {
-      font-size: 1.5rem;
+    .form-header {
+      padding-top: clamp(1.25rem, 3vw, 2rem);
+      padding-bottom: 1.1rem;
+      border-bottom: 1px solid rgba(255, 191, 54, 0.14);
+      background: linear-gradient(180deg, rgba(255, 191, 54, 0.08), transparent);
     }
 
     .page-badge {
+      width: fit-content;
+      margin-bottom: 0.85rem;
+      padding: 0.36rem 0.74rem;
+      border: 1px solid rgba(255, 191, 54, 0.38);
+      border-radius: 999px;
+      color: var(--uc-gold-500);
+      background: rgba(255, 191, 54, 0.08);
       font-size: 0.68rem;
-      padding: 0.45rem 1rem;
-    }
-
-    .btn-register {
-      font-size: 0.92rem;
-      padding: 1rem;
-    }
-  }
-
-  @@media (max-width: 350px) or (max-height: 600px) {
-    .right-panel {
-      padding: 1rem;
-      min-height: auto;
-    }
-
-    .form-box {
-      padding: 1.25rem;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .form-title {
-      font-size: 1.3rem;
+      margin: 0 0 0.45rem;
+      color: var(--text-strong);
+      font-size: 2rem;
+      font-weight: 850;
+      line-height: 1.08;
+      letter-spacing: 0;
     }
-  }
 
-  /* Scrollbar styling */
-  .right-panel::-webkit-scrollbar {
-    width: 8px;
-  }
+    .form-sub {
+      max-width: 46ch;
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
 
-  .right-panel::-webkit-scrollbar-track {
-    background: transparent;
-  }
+    .form-body {
+      padding-top: 1.35rem;
+      padding-bottom: 1.25rem;
+    }
 
-  .right-panel::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, rgba(255, 184, 28, 0.3) 0%, rgba(255, 184, 28, 0.15) 100%);
-    border-radius: 4px;
-  }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem 0.85rem;
+    }
 
-  .right-panel::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, rgba(255, 184, 28, 0.4) 0%, rgba(255, 184, 28, 0.25) 100%);
-  }
-</style>
+    .field-group {
+      min-width: 0;
+    }
 
-<div class="auth-wrapper">
+    .field-group.full {
+      grid-column: 1 / -1;
+    }
 
-  <!-- LEFT PANEL -->
-  <div class="left-panel">
-    <!-- Brand -->
-    <div class="brand-badge">
-      <div class="logo-icon">UC<br>CCS</div>
-      <div>
-        <span class="brand-name">UC CCS</span>
-        <span class="brand-sub">Portal</span>
-      </div>
-    </div>
+    .field-label {
+      display: flex;
+      align-items: baseline;
+      gap: 0.35rem;
+      margin: 0 0 0.42rem;
+      color: var(--text);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
 
-    <!-- Hero -->
-    <div class="hero-content">
-      <div>
-        <div class="new-student-badge">★ New Student Registration</div>
-        <h1>Join the CCS<span class="highlight">Community</span></h1>
-        <p>Create your account and unlock access to courses, faculty, announcements, and the full suite of CCS academic tools — all in one place.</p>
-      </div>
-    </div>
+    .optional-badge {
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+    }
 
-    <div class="left-footer">© University of Cebu – College of Computer Studies</div>
-  </div>
+    .input-wrap input,
+    .input-wrap select {
+      width: 100%;
+      min-height: 46px;
+      padding: 0.78rem 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      outline: none;
+      background: var(--ink-820);
+      color: var(--text-strong);
+      font: inherit;
+      font-size: 0.94rem;
+      transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    }
 
-  <!-- RIGHT PANEL -->
-  <div class="right-panel">
-    <div class="form-box">
+    .input-wrap select {
+      cursor: pointer;
+    }
 
-      <div class="page-badge">✦ Create Account</div>
-      <h2 class="form-title">Join CCS Portal</h2>
-      <div class="form-sub">Fill in your details to get started with your academic journey.</div>
+    .input-wrap input::placeholder {
+      color: oklch(66% 0.012 250);
+    }
 
-      @if (ViewData.ModelState.IsValid == false)
-      {
-        <div class="validation-summary">
-          <strong>Please correct the following errors:</strong>
-          <ul>
-            @foreach (var modelState in ViewData.ModelState.Values)
-            {
-              @foreach (var error in modelState.Errors)
-              {
-                <li>@error.ErrorMessage</li>
-              }
-            }
-          </ul>
-        </div>
+    .input-wrap input:hover,
+    .input-wrap select:hover {
+      border-color: oklch(55% 0.055 84);
+      background: var(--ink-760);
+    }
+
+    .input-wrap input:focus,
+    .input-wrap select:focus {
+      border-color: var(--uc-gold-500);
+      box-shadow: 0 0 0 4px var(--focus);
+      background: var(--ink-760);
+    }
+
+    .val-error {
+      display: block;
+      min-height: 1rem;
+      margin-top: 0.28rem;
+      color: var(--danger);
+      font-size: 0.75rem;
+      font-weight: 650;
+      line-height: 1.35;
+    }
+
+    .validation-summary {
+      margin-bottom: 1rem;
+      padding: 0.9rem 1rem;
+      border: 1px solid color-mix(in oklch, var(--danger) 58%, transparent);
+      border-radius: var(--radius);
+      background: color-mix(in oklch, var(--danger) 14%, transparent);
+      color: oklch(84% 0.10 25);
+      font-size: 0.86rem;
+    }
+
+    .validation-summary strong {
+      display: block;
+      margin-bottom: 0.45rem;
+      color: oklch(90% 0.08 25);
+    }
+
+    .validation-summary ul {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+
+    .file-upload-label {
+      display: grid;
+      gap: 0.2rem;
+      min-height: 84px;
+      padding: 0.9rem;
+      border: 1px dashed color-mix(in oklch, var(--uc-gold-500) 45%, var(--line));
+      border-radius: var(--radius);
+      background: color-mix(in oklch, var(--ink-820) 86%, var(--uc-gold-500) 4%);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .file-upload-label:hover,
+    .file-upload-label.is-dragging {
+      border-color: var(--uc-gold-500);
+      background: var(--ink-760);
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+
+    .file-upload-label input {
+      display: none;
+    }
+
+    .file-upload-icon {
+      color: var(--uc-gold-500);
+      font-size: 1rem;
+      font-weight: 900;
+    }
+
+    .file-upload-text {
+      margin: 0;
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .file-upload-hint,
+    .file-name {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.76rem;
+    }
+
+    .file-name {
+      color: var(--uc-gold-500);
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .btn-register {
+      width: 100%;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      margin-top: 0.2rem;
+      border: 0;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, var(--uc-gold-500), var(--uc-gold-600));
+      color: var(--uc-blue-900);
+      font-size: 0.92rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-shadow: 0 14px 28px rgba(255, 191, 54, 0.18);
+      transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+    }
+
+    .btn-register:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+      box-shadow: 0 18px 34px rgba(255, 191, 54, 0.24);
+    }
+
+    .btn-register:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 4px var(--focus), 0 18px 34px rgba(255, 191, 54, 0.22);
+    }
+
+    .form-footer {
+      padding-top: 1rem;
+      padding-bottom: clamp(1.15rem, 3vw, 1.7rem);
+      border-top: 1px solid rgba(255, 191, 54, 0.14);
+      text-align: center;
+    }
+
+    .login-prompt {
+      margin: 0 0 0.85rem;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    .page-footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.8rem 1rem;
+      font-size: 0.75rem;
+    }
+
+    .page-footer-links a {
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    @@media (max-width: 1180px) {
+      .register-shell {
+        grid-template-columns: minmax(0, 0.86fr) minmax(360px, 500px);
       }
 
-      <form asp-action="Register" method="post" enctype="multipart/form-data">
-        @Html.AntiForgeryToken()
-
-        <!-- First Name & Middle Name row -->
-        <div class="form-grid">
-          <div class="field-group">
-            <label class="field-label">First Name</label>
-            <div class="input-wrap">
-              <input asp-for="FirstName" placeholder="e.g. Juan" value="@Model?.FirstName" />
-            </div>
-            <span asp-validation-for="FirstName" class="val-error"></span>
-          </div>
-
-          <div class="field-group">
-            <label class="field-label">Middle Name <span class="optional-badge">(optional)</span></label>
-            <div class="input-wrap">
-              <input asp-for="MiddleName" placeholder="Middle Name" value="@Model?.MiddleName" />
-            </div>
-          </div>
-        </div>
-
-        <!-- ID Number & Last Name -->
-        <div class="form-grid">
-          <div class="field-group">
-            <label class="field-label">ID Number</label>
-            <div class="input-wrap">
-              <input asp-for="IdNumber" placeholder="23-xxx-xxx" value="@Model?.IdNumber" />
-            </div>
-            <span asp-validation-for="IdNumber" class="val-error"></span>
-          </div>
-
-          <div class="field-group">
-            <label class="field-label">Last Name</label>
-            <div class="input-wrap">
-              <input asp-for="LastName" placeholder="Last Name" value="@Model?.LastName" />
-            </div>
-            <span asp-validation-for="LastName" class="val-error"></span>
-          </div>
-        </div>
-
-        <!-- Course -->
-        <div class="field-group form-grid full">
-          <label class="field-label">Course</label>
-          <div class="input-wrap">
-            <select asp-for="Course">
-              <option value="">Select Course</option>
-              <option value="BSIT">BSIT</option>
-              <option value="BSCS">BSCS</option>
-              <option value="BSCE">BSCE</option>
-              <option value="BSIS">BSIS</option>
-            </select>
-          </div>
-          <span asp-validation-for="Course" class="val-error"></span>
-        </div>
-
-        <!-- Email Address -->
-        <div class="field-group form-grid full">
-          <label class="field-label">Email Address</label>
-          <div class="input-wrap">
-            <input asp-for="Email" type="email" placeholder="yourname@uc.edu.ph" value="@Model?.Email" />
-          </div>
-          <span asp-validation-for="Email" class="val-error"></span>
-        </div>
-
-        <!-- Year Level & Address -->
-        <div class="form-grid">
-          <div class="field-group">
-            <label class="field-label">Year Level</label>
-            <div class="input-wrap">
-              <select asp-for="CourseLevel">
-                <option value="">Select Level</option>
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
-                <option value="4">4th Year</option>
-              </select>
-            </div>
-            <span asp-validation-for="CourseLevel" class="val-error"></span>
-          </div>
-
-          <div class="field-group">
-            <label class="field-label">Address</label>
-            <div class="input-wrap">
-              <input asp-for="Address" placeholder="Your Address" value="@Model?.Address" />
-            </div>
-            <span asp-validation-for="Address" class="val-error"></span>
-          </div>
-        </div>
-
-        <!-- Password -->
-        <div class="field-group form-grid full">
-          <label class="field-label">Password</label>
-          <div class="input-wrap">
-            <input asp-for="Password" type="password" placeholder="Min. 6 characters" />
-          </div>
-          <span asp-validation-for="Password" class="val-error"></span>
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="field-group form-grid full">
-          <label class="field-label">Confirm Password</label>
-          <div class="input-wrap">
-            <input asp-for="ConfirmPassword" type="password" placeholder="Re-enter your password" />
-          </div>
-          <span asp-validation-for="ConfirmPassword" class="val-error"></span>
-        </div>
-
-        <!-- Profile Picture -->
-        <div class="field-group form-grid full">
-          <label class="field-label">Profile Picture <span class="optional-badge">(optional)</span></label>
-          <div class="file-upload-wrapper">
-            <label class="file-upload-label" for="profilePictureFile">
-              <p style="font-size:1.3rem; margin-bottom:0.35rem;">📸</p>
-              <p class="file-upload-text">Click to upload or drag and drop</p>
-              <p style="color:#a0a0a0; font-size:0.75rem; margin-top:0.25rem;">PNG, JPG, GIF (Max 10MB)</p>
-              <p class="file-name" id="fileName"></p>
-              <input type="file" id="profilePictureFile" name="profilePictureFile" accept="image/*" />
-            </label>
-          </div>
-        </div>
-
-        <button type="submit" class="btn-register">
-          <span>👤</span>
-          <span>Create Account</span>
-        </button>
-
-      </form>
-
-      <div class="or-divider">
-        <span></span>
-        or
-        <span></span>
-      </div>
-
-      <div class="login-prompt">
-        Already have an account? <a href="/Student/Index">Login Here</a>
-      </div>
-
-      <div class="page-footer-links">
-        <a href="#">Help</a>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Use</a>
-      </div>
-
-    </div>
-  </div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-<script>
-  // File name display
-  document.getElementById('profilePictureFile').addEventListener('change', function(e) {
-    const fileName = document.getElementById('fileName');
-    if (e.target.files.length > 0) {
-      fileName.textContent = '✓ ' + e.target.files[0].name;
-    } else {
-      fileName.textContent = '';
+      .intro-copy h1 {
+        font-size: 3.05rem;
+      }
     }
-  });
 
-  // Drag and drop
-  const fileLabel = document.querySelector('.file-upload-label');
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => {
-    fileLabel.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); });
-  });
-  ['dragenter', 'dragover'].forEach(ev => {
-    fileLabel.addEventListener(ev, () => {
-      fileLabel.style.borderColor = 'rgba(255, 184, 28, 0.5)';
-      fileLabel.style.background = 'linear-gradient(135deg, rgba(38, 38, 65, 0.95) 0%, rgba(61, 61, 92, 0.7) 100%)';
-    });
-  });
-  ['dragleave', 'drop'].forEach(ev => {
-    fileLabel.addEventListener(ev, () => {
-      fileLabel.style.borderColor = 'rgba(255, 184, 28, 0.2)';
-      fileLabel.style.background = 'linear-gradient(135deg, rgba(38, 38, 65, 0.8) 0%, rgba(61, 61, 92, 0.6) 100%)';
-    });
-  });
-  fileLabel.addEventListener('drop', e => {
-    const files = e.dataTransfer.files;
-    document.getElementById('profilePictureFile').files = files;
-    document.getElementById('profilePictureFile').dispatchEvent(new Event('change', { bubbles: true }));
-  });
-</script>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --blue-dark:  #0a1f5c;
-    --blue-mid:   #0d47a1;
-    --blue-main:  #1565c0;
-    --gold:       #f5c518;
-    --danger:     #e53935;
-    --success:    #2e7d32;
-    --text-dark:  #1a1a2e;
-    --text-muted: #6b7280;
-    --border:     #e5e7eb;
-  }
-
-  html, body {
-    height: 100%;
-    font-family: 'DM Sans', sans-serif;
-    overflow: hidden;
-  }
-
-  /* ── Split wrapper ── */
-  .auth-wrapper {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-  }
-
-  /* ── LEFT PANEL ── */
-  .left-panel {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 2rem 2.5rem;
-    min-width: 0;
-  }
-
-  .left-panel::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: url('https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1200&auto=format&fit=crop') center/cover no-repeat;
-    z-index: 0;
-  }
-
-  .left-panel::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      180deg,
-      rgba(10, 31, 92, 0.50) 0%,
-      rgba(10, 31, 92, 0.25) 40%,
-      rgba(10, 31, 92, 0.80) 100%
-    );
-    z-index: 1;
-  }
-
-  .left-panel > * { position: relative; z-index: 2; }
-
-  /* Logo badge */
-  .brand-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 10px;
-    padding: 0.5rem 1rem;
-    width: fit-content;
-  }
-
-  .brand-badge .logo-icon {
-    width: 32px;
-    height: 32px;
-    background: var(--gold);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 0.7rem;
-    color: var(--blue-dark);
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    text-align: center;
-  }
-
-  .brand-badge .brand-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 0.03em;
-  }
-
-  .brand-badge .brand-sub {
-    font-size: 0.7rem;
-    color: rgba(255,255,255,0.7);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    display: block;
-    line-height: 1;
-  }
-
-  /* Hero text */
-  .hero-content {
-    padding-bottom: 1rem;
-  }
-
-  .new-student-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    background: rgba(245, 197, 24, 0.2);
-    border: 1px solid rgba(245, 197, 24, 0.5);
-    color: var(--gold);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 0.3rem 0.75rem;
-    border-radius: 20px;
-    margin-bottom: 1rem;
-  }
-
-  .hero-content h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(1.8rem, 3vw, 2.6rem);
-    font-weight: 800;
-    color: #fff;
-    line-height: 1.15;
-    margin-bottom: 1rem;
-  }
-
-  .hero-content p {
-    font-size: 0.88rem;
-    color: rgba(255,255,255,0.75);
-    line-height: 1.65;
-    max-width: 340px;
-  }
-
-  .left-footer {
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.45);
-  }
-
-  /* ── RIGHT PANEL ── */
-  .right-panel {
-    width: 460px;
-    flex-shrink: 0;
-    background: #fff;
-    overflow-y: auto;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 2rem 2.5rem;
-  }
-
-  .form-box {
-    width: 100%;
-    max-width: 380px;
-    padding-top: 0.5rem;
-    animation: slideUp 0.45s ease-out both;
-  }
-
-  @@keyframes slideUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* CREATE ACCOUNT badge */
-  .page-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: var(--blue-dark);
-    color: #fff;
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 0.3rem 0.75rem;
-    border-radius: 20px;
-    margin-bottom: 0.85rem;
-  }
-
-  .form-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.55rem;
-    font-weight: 800;
-    color: var(--text-dark);
-    line-height: 1.2;
-    margin-bottom: 0.3rem;
-  }
-
-  .form-sub {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-bottom: 1.4rem;
-    line-height: 1.5;
-  }
-
-  /* ── Form Grid ── */
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-  }
-
-  .form-grid.full { grid-template-columns: 1fr; }
-
-  /* ── Inputs ── */
-  .field-group { margin-bottom: 0.85rem; }
-
-  .field-label {
-    display: block;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #374151;
-    margin-bottom: 0.4rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-
-  .field-label .optional-badge {
-    font-size: 0.65rem;
-    color: #9ca3af;
-    font-weight: 400;
-    text-transform: lowercase;
-    letter-spacing: 0;
-    margin-left: 4px;
-  }
-
-  .input-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
-  .input-wrap input,
-  .input-wrap select {
-    width: 100%;
-    background: #f9fafb;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    color: var(--text-dark);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.84rem;
-    padding: 0.65rem 0.85rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
-  }
-
-  .input-wrap input::placeholder { color: #d1d5db; }
-
-  .input-wrap input:focus,
-  .input-wrap select:focus {
-    border-color: var(--blue-main);
-    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.10);
-    background: #fff;
-  }
-
-  /* ── File Upload ── */
-  .file-upload-label {
-    display: block;
-    padding: 1.2rem;
-    border: 1.5px dashed var(--border);
-    border-radius: 8px;
-    text-align: center;
-    background: #f9fafb;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .file-upload-label:hover {
-    border-color: var(--blue-main);
-    background: #eff6ff;
-  }
-
-  .file-upload-label input { display: none; }
-
-  .file-upload-text {
-    color: var(--text-muted);
-    font-size: 0.82rem;
-  }
-
-  .file-name {
-    color: var(--blue-main);
-    font-weight: 600;
-    margin-top: 0.4rem;
-    font-size: 0.82rem;
-  }
-
-  /* ── Submit ── */
-  .btn-register {
-    width: 100%;
-    padding: 0.82rem;
-    background: var(--blue-main);
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    font-family: 'Syne', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    box-shadow: 0 4px 14px rgba(21, 101, 192, 0.35);
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .btn-register:hover {
-    background: var(--blue-dark);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(21, 101, 192, 0.4);
-    color: #fff;
-    text-decoration: none;
-  }
-
-  .btn-register:active { transform: translateY(0); }
-
-  .btn-register::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%);
-    transform: translateX(-100%);
-    transition: transform 0.55s;
-  }
-
-  .btn-register:hover::after { transform: translateX(100%); }
-
-  /* ── Alerts ── */
-  .alert-success-dark {
-    background: #f0fdf4;
-    border: 1.5px solid #86efac;
-    color: var(--success);
-    border-radius: 8px;
-    padding: 0.7rem 0.9rem;
-    font-size: 0.8rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .alert-danger-dark {
-    background: #fef2f2;
-    border: 1.5px solid #fca5a5;
-    color: var(--danger);
-    border-radius: 8px;
-    padding: 0.7rem 0.9rem;
-    font-size: 0.8rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .validation-summary {
-    background: #fef2f2;
-    border: 1.5px solid #fca5a5;
-    color: var(--danger);
-    border-radius: 8px;
-    padding: 0.85rem 1rem;
-    font-size: 0.8rem;
-    margin-bottom: 1rem;
-  }
-
-  .validation-summary ul { margin: 0; padding-left: 1.4rem; }
-  .validation-summary li { margin-bottom: 0.35rem; }
-
-  /* ── Login prompt ── */
-  .login-prompt {
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-  }
-
-  .login-prompt a {
-    color: var(--blue-main);
-    text-decoration: none;
-    font-weight: 700;
-  }
-
-  .login-prompt a:hover { color: var(--blue-dark); }
-
-  /* bottom page links */
-  .page-footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 1.2rem;
-    margin-top: 1.5rem;
-    font-size: 0.73rem;
-    color: #9ca3af;
-    padding-bottom: 1rem;
-  }
-
-  .page-footer-links a {
-    color: #9ca3af;
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .page-footer-links a:hover { color: var(--blue-main); }
-
-  /* Field validation spans */
-  .val-error {
-    display: block;
-    margin-top: 0.25rem;
-    color: var(--danger);
-    font-size: 0.76rem;
-  }
-
-  /* ── Responsive ── */
-  @@media (max-width: 900px) {
-    .left-panel { display: none; }
-    .right-panel { width: 100%; padding: 2rem 1.5rem; }
-    .form-grid { grid-template-columns: 1fr; }
-  }
-</style>
-
-<div class="auth-wrapper">
-
-  <!-- LEFT PANEL -->
-  <div class="left-panel">
-    <!-- Brand -->
-    <div class="brand-badge">
-      <div class="logo-icon">UC<br>CCS</div>
-      <div>
-        <span class="brand-name">UC CCS</span>
-        <span class="brand-sub">College of Computer Studies</span>
-      </div>
-    </div>
-
-    <!-- Hero -->
-    <div class="hero-content">
-      <div class="new-student-badge">★ New Student Registration</div>
-      <h1>Join the CCS<br>Community</h1>
-      <p>Create your account and unlock access to courses, faculty, announcements, and the full suite of CCS academic tools — all in one place.</p>
-    </div>
-
-    <div class="left-footer">© University of Cebu &mdash; Student Academic Portal &copy; 2025</div>
-  </div>
-
-  <!-- RIGHT PANEL -->
-  <div class="right-panel">
-    <div class="form-box">
-
-      <div class="page-badge">✦ Create Account</div>
-      <div class="form-title">Join CCS Portal</div>
-      <div class="form-sub">Fill in your details to get started with your academic journey.</div>
-
-      @if (ViewData.ModelState.IsValid == false)
-      {
-        <div class="validation-summary">
-          <strong>Please correct the following errors:</strong>
-          <ul>
-            @foreach (var modelState in ViewData.ModelState.Values)
-            {
-              @foreach (var error in modelState.Errors)
-              {
-                <li>@error.ErrorMessage</li>
-              }
-            }
-          </ul>
-        </div>
+    @@media (max-width: 980px) {
+      body {
+        background-position: 35% center;
       }
 
-      <form asp-action="Register" method="post" enctype="multipart/form-data">
-        @Html.AntiForgeryToken()
+      .register-shell {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        align-items: start;
+      }
 
-        <!-- First Name & Middle Name row -->
-        <div class="form-grid">
-          <div class="field-group">
-            <label class="field-label">First Name</label>
-            <div class="input-wrap">
-              <input asp-for="FirstName" placeholder="e.g. Juan" value="@Model?.FirstName" />
-            </div>
-            <span asp-validation-for="FirstName" class="val-error"></span>
-          </div>
+      .intro-panel {
+        min-height: auto;
+        max-width: 760px;
+        grid-template-rows: auto auto;
+        gap: 1.6rem;
+        margin-inline: auto;
+        padding: 0;
+      }
 
-          <div class="field-group">
-            <label class="field-label">Middle Name <span class="optional-badge">(optional)</span></label>
-            <div class="input-wrap">
-              <input asp-for="MiddleName" placeholder="Middle Name" value="@Model?.MiddleName" />
-            </div>
-          </div>
-        </div>
+      .intro-copy {
+        align-self: auto;
+        padding-bottom: 0;
+      }
 
-        <!-- ID Number & Last Name -->
-        <div class="form-grid">
-          <div class="field-group">
-            <label class="field-label">ID Number</label>
-            <div class="input-wrap">
-              <input asp-for="IdNumber" placeholder="23-xxx-xxx" value="@Model?.IdNumber" />
-            </div>
-            <span asp-validation-for="IdNumber" class="val-error"></span>
-          </div>
+      .intro-copy h1 {
+        font-size: 2.35rem;
+      }
 
-          <div class="field-group">
-            <label class="field-label">Last Name</label>
-            <div class="input-wrap">
-              <input asp-for="LastName" placeholder="Last Name" value="@Model?.LastName" />
-            </div>
-            <span asp-validation-for="LastName" class="val-error"></span>
-          </div>
-        </div>
+      .intro-copy p {
+        font-size: 0.98rem;
+      }
 
-        <!-- Course -->
-        <div class="field-group">
-          <label class="field-label">Course</label>
-          <div class="input-wrap">
-            <select asp-for="Course">
-              <option value="">Select Course</option>
-              <option value="BSIT">BSIT</option>
-              <option value="BSCS">BSCS</option>
-              <option value="BSCE">BSCE</option>
-              <option value="BSIS">BSIS</option>
-            </select>
-          </div>
-          <span asp-validation-for="Course" class="val-error"></span>
-        </div>
+      .intro-footer {
+        display: none;
+      }
 
-        <!-- Email Address -->
-        <div class="field-group">
-          <label class="field-label">Email Address</label>
-          <div class="input-wrap">
-            <input asp-for="Email" type="email" placeholder="yourname@uc.edu.ph" value="@Model?.Email" />
-          </div>
-          <span asp-validation-for="Email" class="val-error"></span>
-        </div>
-
-        <!-- Course Level & Address -->
-        <div class="form-grid">
-          <div class="field-group">
-            <label class="field-label">Year Level</label>
-            <div class="input-wrap">
-              <select asp-for="CourseLevel">
-                <option value="">Select Level</option>
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
-                <option value="4">4th Year</option>
-              </select>
-            </div>
-            <span asp-validation-for="CourseLevel" class="val-error"></span>
-          </div>
-
-          <div class="field-group">
-            <label class="field-label">Address</label>
-            <div class="input-wrap">
-              <input asp-for="Address" placeholder="Your Address" value="@Model?.Address" />
-            </div>
-            <span asp-validation-for="Address" class="val-error"></span>
-          </div>
-        </div>
-
-        <!-- Password -->
-        <div class="field-group">
-          <label class="field-label">Password</label>
-          <div class="input-wrap">
-            <input asp-for="Password" type="password" placeholder="Min. 6 characters" />
-          </div>
-          <span asp-validation-for="Password" class="val-error"></span>
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="field-group">
-          <label class="field-label">Confirm Password</label>
-          <div class="input-wrap">
-            <input asp-for="ConfirmPassword" type="password" placeholder="Re-enter your password" />
-          </div>
-          <span asp-validation-for="ConfirmPassword" class="val-error"></span>
-        </div>
-
-        <!-- Profile Picture -->
-        <div class="field-group">
-          <label class="field-label">Profile Picture <span class="optional-badge">(optional)</span></label>
-          <div class="file-upload-wrapper">
-            <label class="file-upload-label" for="profilePictureFile">
-              <p style="font-size:1.3rem; margin-bottom:0.35rem;">📸</p>
-              <p class="file-upload-text">Click to upload or drag and drop</p>
-              <p style="color:#9ca3af; font-size:0.75rem; margin-top:0.25rem;">PNG, JPG, GIF (Max 10MB)</p>
-              <p class="file-name" id="fileName"></p>
-              <input type="file" id="profilePictureFile" name="profilePictureFile" accept="image/*" />
-            </label>
-          </div>
-        </div>
-
-        <button type="submit" class="btn-register">👤 Create Account</button>
-
-      </form>
-
-      <div class="or-divider" style="display:flex;align-items:center;gap:0.75rem;font-size:0.78rem;color:#d1d5db;margin-bottom:1rem;">
-        <span style="flex:1;height:1px;background:#e5e7eb;display:block;"></span>
-        or
-        <span style="flex:1;height:1px;background:#e5e7eb;display:block;"></span>
-      </div>
-
-      <div class="login-prompt">
-        Already have an account? <a href="/Student/Index">Login Here</a>
-      </div>
-
-      <div class="page-footer-links">
-        <a href="#">Help</a>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Use</a>
-      </div>
-
-    </div>
-  </div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-<script>
-  // File name display
-  document.getElementById('profilePictureFile').addEventListener('change', function(e) {
-    const fileName = document.getElementById('fileName');
-    if (e.target.files.length > 0) {
-      fileName.textContent = '✓ ' + e.target.files[0].name;
-    } else {
-      fileName.textContent = '';
+      .form-panel {
+        max-width: 760px;
+        justify-self: center;
+      }
     }
-  });
 
-  // Drag and drop
-  const fileLabel = document.querySelector('.file-upload-label');
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => {
-    fileLabel.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); });
-  });
-  ['dragenter', 'dragover'].forEach(ev => {
-    fileLabel.addEventListener(ev, () => {
-      fileLabel.style.borderColor = '#1565c0';
-      fileLabel.style.background = '#eff6ff';
-    });
-  });
-  ['dragleave', 'drop'].forEach(ev => {
-    fileLabel.addEventListener(ev, () => {
-      fileLabel.style.borderColor = '#e5e7eb';
-      fileLabel.style.background = '#f9fafb';
-    });
-  });
-  fileLabel.addEventListener('drop', e => {
-    const files = e.dataTransfer.files;
-    document.getElementById('profilePictureFile').files = files;
-    document.getElementById('profilePictureFile').dispatchEvent(new Event('change', { bubbles: true }));
-  });
-</script>
+    @@media (max-width: 620px) {
+      .register-shell {
+        padding: 0.8rem;
+      }
+
+      .brand-mark {
+        padding: 0.55rem 0.65rem;
+      }
+
+      .brand-logo {
+        width: 38px;
+        height: 38px;
+      }
+
+      .intro-copy h1 {
+        font-size: 2rem;
+      }
+
+      .intro-copy p {
+        font-size: 0.92rem;
+        line-height: 1.6;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-title {
+        font-size: 1.65rem;
+      }
+
+      .form-card {
+        border-radius: 10px;
+      }
+    }
+
+    @@media (max-height: 760px) and (min-width: 981px) {
+      .register-shell {
+        align-items: start;
+      }
+
+      .intro-panel {
+        min-height: auto;
+        position: sticky;
+        top: 1rem;
+      }
+
+      .intro-copy h1 {
+        font-size: 2.85rem;
+      }
+
+      .intro-copy p {
+        font-size: 0.95rem;
+        line-height: 1.55;
+      }
+
+      .form-header {
+        padding-top: 1.35rem;
+      }
+
+      .form-body {
+        padding-top: 1rem;
+      }
+
+      .form-grid {
+        gap: 0.68rem 0.72rem;
+      }
+
+      .input-wrap input,
+      .input-wrap select {
+        min-height: 42px;
+        padding-block: 0.62rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="register-shell">
+    <section class="intro-panel" aria-label="UC CCS Portal introduction">
+      <div class="brand-mark">
+        <div class="brand-logo">UC<br />CCS</div>
+        <div class="brand-text">
+          UC CCS
+          <span>Student Portal</span>
+        </div>
+      </div>
+
+      <div class="intro-copy">
+        <div class="eyebrow">New student registration</div>
+        <h1>Join the CCS <span>Community</span></h1>
+        <p>Create one student account for CCS announcements, course records, lab reservations, sit-in monitoring, rewards, and profile updates.</p>
+      </div>
+
+      <div class="intro-footer">University of Cebu, College of Computer Studies</div>
+    </section>
+
+    <section class="form-panel" aria-label="Create student account form">
+      <div class="form-card">
+        <header class="form-header">
+          <div class="page-badge">Create account</div>
+          <h2 class="form-title">Student registration</h2>
+          <p class="form-sub">Use your student details. Required fields are checked before your account is created.</p>
+        </header>
+
+        <div class="form-body">
+          @if (ViewData.ModelState.IsValid == false)
+          {
+            <div class="validation-summary">
+              <strong>Please correct the following:</strong>
+              <ul>
+                @foreach (var modelState in ViewData.ModelState.Values)
+                {
+                  @foreach (var error in modelState.Errors)
+                  {
+                    <li>@error.ErrorMessage</li>
+                  }
+                }
+              </ul>
+            </div>
+          }
+
+          <form asp-action="Register" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <div class="form-grid">
+              <div class="field-group">
+                <label asp-for="FirstName" class="field-label">First name</label>
+                <div class="input-wrap">
+                  <input asp-for="FirstName" autocomplete="given-name" placeholder="Juan" />
+                </div>
+                <span asp-validation-for="FirstName" class="val-error"></span>
+              </div>
+
+              <div class="field-group">
+                <label asp-for="MiddleName" class="field-label">Middle name <span class="optional-badge">optional</span></label>
+                <div class="input-wrap">
+                  <input asp-for="MiddleName" autocomplete="additional-name" placeholder="Middle name" />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label asp-for="LastName" class="field-label">Last name</label>
+                <div class="input-wrap">
+                  <input asp-for="LastName" autocomplete="family-name" placeholder="Dela Cruz" />
+                </div>
+                <span asp-validation-for="LastName" class="val-error"></span>
+              </div>
+
+              <div class="field-group">
+                <label asp-for="IdNumber" class="field-label">ID number</label>
+                <div class="input-wrap">
+                  <input asp-for="IdNumber" inputmode="text" placeholder="23-123-456" />
+                </div>
+                <span asp-validation-for="IdNumber" class="val-error"></span>
+              </div>
+
+              <div class="field-group">
+                <label asp-for="Course" class="field-label">Course</label>
+                <div class="input-wrap">
+                  <select asp-for="Course">
+                    <option value="">Select course</option>
+                    <option value="BSIT">BSIT</option>
+                    <option value="BSCS">BSCS</option>
+                    <option value="BSCE">BSCE</option>
+                    <option value="BSIS">BSIS</option>
+                  </select>
+                </div>
+                <span asp-validation-for="Course" class="val-error"></span>
+              </div>
+
+              <div class="field-group">
+                <label asp-for="CourseLevel" class="field-label">Year level</label>
+                <div class="input-wrap">
+                  <select asp-for="CourseLevel">
+                    <option value="">Select level</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                  </select>
+                </div>
+                <span asp-validation-for="CourseLevel" class="val-error"></span>
+              </div>
+
+              <div class="field-group full">
+                <label asp-for="Email" class="field-label">Email address</label>
+                <div class="input-wrap">
+                  <input asp-for="Email" type="email" autocomplete="email" placeholder="yourname@uc.edu.ph" />
+                </div>
+                <span asp-validation-for="Email" class="val-error"></span>
+              </div>
+
+              <div class="field-group full">
+                <label asp-for="Address" class="field-label">Address</label>
+                <div class="input-wrap">
+                  <input asp-for="Address" autocomplete="street-address" placeholder="Complete address" />
+                </div>
+                <span asp-validation-for="Address" class="val-error"></span>
+              </div>
+
+              <div class="field-group">
+                <label asp-for="Password" class="field-label">Password</label>
+                <div class="input-wrap">
+                  <input asp-for="Password" type="password" autocomplete="new-password" placeholder="Minimum 6 characters" />
+                </div>
+                <span asp-validation-for="Password" class="val-error"></span>
+              </div>
+
+              <div class="field-group">
+                <label asp-for="ConfirmPassword" class="field-label">Confirm password</label>
+                <div class="input-wrap">
+                  <input asp-for="ConfirmPassword" type="password" autocomplete="new-password" placeholder="Re-enter password" />
+                </div>
+                <span asp-validation-for="ConfirmPassword" class="val-error"></span>
+              </div>
+
+              <div class="field-group full">
+                <label class="field-label" for="profilePictureFile">Profile picture <span class="optional-badge">optional</span></label>
+                <label class="file-upload-label" for="profilePictureFile">
+                  <span class="file-upload-icon" aria-hidden="true">Upload</span>
+                  <p class="file-upload-text">Choose a photo or drag it here</p>
+                  <p class="file-upload-hint">PNG, JPG, or GIF, up to 10MB</p>
+                  <p class="file-name" id="fileName" aria-live="polite"></p>
+                  <input type="file" id="profilePictureFile" name="profilePictureFile" accept="image/*" />
+                </label>
+              </div>
+
+              <div class="field-group full">
+                <button type="submit" class="btn-register">
+                  <span aria-hidden="true">+</span>
+                  <span>Create account</span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <footer class="form-footer">
+          <p class="login-prompt">Already have an account? <a href="/Student/Index">Sign in</a></p>
+          <div class="page-footer-links">
+            <a href="#">Help</a>
+            <a href="/Home/Privacy">Privacy</a>
+            <a href="#">Terms</a>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <script src="~/lib/jquery/dist/jquery.min.js"></script>
+  <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+  <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+  <script>
+    const fileInput = document.getElementById("profilePictureFile");
+    const fileName = document.getElementById("fileName");
+    const fileLabel = document.querySelector(".file-upload-label");
+
+    if (fileInput && fileName && fileLabel) {
+      fileInput.addEventListener("change", function (event) {
+        const file = event.target.files && event.target.files[0];
+        fileName.textContent = file ? file.name : "";
+      });
+
+      ["dragenter", "dragover", "dragleave", "drop"].forEach(function (eventName) {
+        fileLabel.addEventListener(eventName, function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        });
+      });
+
+      ["dragenter", "dragover"].forEach(function (eventName) {
+        fileLabel.addEventListener(eventName, function () {
+          fileLabel.classList.add("is-dragging");
+        });
+      });
+
+      ["dragleave", "drop"].forEach(function (eventName) {
+        fileLabel.addEventListener(eventName, function () {
+          fileLabel.classList.remove("is-dragging");
+        });
+      });
+
+      fileLabel.addEventListener("drop", function (event) {
+        if (event.dataTransfer.files.length) {
+          fileInput.files = event.dataTransfer.files;
+          fileInput.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      });
+    }
+  </script>
+</body>
+</html>

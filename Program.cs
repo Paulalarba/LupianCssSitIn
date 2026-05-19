@@ -6,6 +6,10 @@ DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 // Priority 1: DATABASE_URL (Standard for Render/Heroku/Supabase)
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL")?.Trim('"');
 string? connectionString = null;
