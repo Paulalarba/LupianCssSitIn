@@ -1,12 +1,13 @@
 @model CCSMonitoringSystem.Models.Student
 @{
+    Layout = null;
     ViewData["Title"] = "CCS Portal - Student Login";
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
@@ -49,17 +50,16 @@
         html, body {
             margin: 0;
             padding: 0;
-            height: 100%;
+            min-height: 100%;
             width: 100%;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            overflow: hidden;
         }
 
         body {
             display: flex;
             flex-direction: column;
-            position: fixed;
-            inset: 0;
+            position: relative;
+            background: var(--bg-dark);
         }
 
         /* Background image layer — only this gets dimmed, not the content */
@@ -70,6 +70,7 @@
             background: url('https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1400&auto=format&fit=crop&q=80');
             background-size: cover;
             background-position: center;
+            background-attachment: fixed;
             filter: brightness(0.45) saturate(1.1);
             z-index: 0;
             pointer-events: none;
@@ -88,23 +89,17 @@
             );
             z-index: 0;
             pointer-events: none;
+            background-attachment: fixed;
         }
 
-        /* ════════════════════════════════════════════════════════════ */
-        /* MAIN CONTAINER                                               */
-        /* ════════════════════════════════════════════════════════════ */
         .auth-container {
             display: flex;
             width: 100%;
-            height: 100%;
-            overflow: hidden;
+            min-height: 100vh;
             position: relative;
             z-index: 1;
         }
 
-        /* ════════════════════════════════════════════════════════════ */
-        /* HERO PANEL - LEFT                                            */
-        /* ════════════════════════════════════════════════════════════ */
         .hero-panel {
             flex: 1;
             position: relative;
@@ -113,7 +108,6 @@
             justify-content: space-between;
             padding: clamp(2rem, 4vw, 4rem) clamp(2rem, 5vw, 3.5rem);
             min-height: 100vh;
-            overflow: hidden;
         }
 
         .hero-panel > * {
@@ -121,7 +115,6 @@
             z-index: 2;
         }
 
-        /* Logo treatment with enhanced styling */
         .logo-lockup {
             display: inline-flex;
             align-items: center;
@@ -181,7 +174,6 @@
             text-transform: uppercase;
         }
 
-        /* Hero content with enhanced typography */
         .hero-content {
             flex: 1;
             display: flex;
@@ -228,7 +220,6 @@
             letter-spacing: 0.01em;
         }
 
-        /* Accent line */
         .hero-accent {
             display: flex;
             align-items: center;
@@ -264,7 +255,6 @@
             box-shadow: 0 0 12px rgba(255, 184, 28, 0.5);
         }
 
-        /* Footer on hero */
         .hero-footer {
             font-size: 0.68rem;
             color: oklch(86% 0.13 84);
@@ -274,38 +264,19 @@
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
         }
 
-        /* ════════════════════════════════════════════════════════════ */
-        /* FORM PANEL - RIGHT                                           */
-        /* ════════════════════════════════════════════════════════════ */
         .form-panel {
             width: clamp(350px, 100%, 440px);
             flex-shrink: 0;
             background: transparent;
-            overflow-y: auto;
-            overflow-x: hidden;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
             padding: clamp(1.5rem, 3vw, 2.5rem);
-            height: 100%;
+            min-height: 100vh;
             position: relative;
             min-width: 280px;
         }
 
-        /* Decorative background elements */
-        .form-panel::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(255, 184, 28, 0.08) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        /* Form wrapper with enhanced card effect */
         .form-card {
             width: 100%;
             max-width: clamp(300px, 90vw, 380px);
@@ -314,13 +285,10 @@
             border: 1px solid rgba(255, 184, 28, 0.15);
             border-radius: 20px;
             padding: clamp(1.5rem, 3vw, 2.5rem);
-            box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.7),
-                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
             animation: slideInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
             position: relative;
             z-index: 1;
-            margin: auto 0;
         }
 
         @@keyframes slideInUp {
@@ -334,7 +302,6 @@
             }
         }
 
-        /* Form header */
         .form-header {
             margin-bottom: 2.5rem;
             text-align: center;
@@ -352,7 +319,6 @@
             padding: 0.5rem 1.1rem;
             border-radius: 24px;
             margin-bottom: 1.2rem;
-            box-shadow: 0 4px 12px rgba(255, 184, 28, 0.1);
         }
 
         .form-title {
@@ -362,7 +328,6 @@
             color: oklch(98% 0.006 250);
             line-height: 1.1;
             margin-bottom: 0.6rem;
-            letter-spacing: -0.01em;
         }
 
         .form-subtitle {
@@ -370,10 +335,8 @@
             color: oklch(90% 0.008 250);
             line-height: 1.6;
             margin: 0;
-            font-weight: 400;
         }
 
-        /* Form groups */
         .form-group {
             margin-bottom: 1.6rem;
         }
@@ -388,7 +351,6 @@
             letter-spacing: 0.07em;
         }
 
-        /* Input field styling */
         .input-wrapper {
             position: relative;
             display: flex;
@@ -402,47 +364,26 @@
             color: rgba(232, 232, 232, 0.8);
             pointer-events: none;
             z-index: 1;
-            transition: all 0.3s ease;
         }
 
         .form-group input {
             width: 100%;
-            background: linear-gradient(135deg, rgba(38, 38, 65, 0.95) 0%, rgba(61, 61, 92, 0.7) 100%);
+            background: rgba(38, 38, 65, 0.95);
             border: 1.5px solid rgba(255, 184, 28, 0.15);
             border-radius: 10px;
             color: oklch(98% 0.006 250);
             font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
             padding: 1rem 1.2rem 1rem 3.2rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(4px);
-        }
-
-        .form-group input::placeholder {
-            color: rgba(224, 224, 224, 0.5);
+            transition: all 0.3s ease;
         }
 
         .form-group input:focus {
             outline: none;
             border-color: var(--uc-gold);
-            background: linear-gradient(135deg, rgba(38, 38, 65, 1) 0%, rgba(61, 61, 92, 0.7) 100%);
-            box-shadow: 
-                0 0 0 4px var(--focus-gold),
-                0 0 20px rgba(255, 184, 28, 0.2),
-                inset 0 1px 3px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 0 4px var(--focus-gold);
         }
 
-        .form-group input:focus ~ .input-icon {
-            color: var(--uc-gold);
-            transform: scale(1.1);
-        }
-
-        .form-group input:hover:not(:focus) {
-            border-color: rgba(255, 184, 28, 0.25);
-            background: linear-gradient(135deg, rgba(38, 38, 65, 0.95) 0%, rgba(61, 61, 92, 0.6) 100%);
-        }
-
-        /* Meta row - Remember me + Forgot password */
         .meta-row {
             display: flex;
             align-items: center;
@@ -457,64 +398,14 @@
             gap: 0.7rem;
             cursor: pointer;
             color: oklch(84% 0.01 250);
-            transition: all 0.3s ease;
-        }
-
-        .remember-me:hover {
-            color: oklch(98% 0.006 250);
-        }
-
-        .remember-me input[type="checkbox"] {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 1.5px solid rgba(255, 184, 28, 0.2);
-            border-radius: 5px;
-            cursor: pointer;
-            background: linear-gradient(135deg, rgba(38, 38, 65, 0.8) 0%, rgba(61, 61, 92, 0.6) 100%);
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .remember-me input[type="checkbox"]:hover {
-            border-color: rgba(255, 184, 28, 0.4);
-        }
-
-        .remember-me input[type="checkbox"]:checked {
-            background: linear-gradient(135deg, var(--uc-gold) 0%, var(--uc-gold-light) 100%);
-            border-color: var(--uc-gold);
-            box-shadow: 0 0 12px rgba(255, 184, 28, 0.3);
         }
 
         .forgot-password {
             color: var(--uc-gold);
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s ease;
-            position: relative;
-            font-size: 0.87rem;
         }
 
-        .forgot-password::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--uc-gold), transparent);
-            transition: width 0.3s ease;
-        }
-
-        .forgot-password:hover {
-            color: var(--uc-gold-light);
-        }
-
-        .forgot-password:hover::after {
-            width: 100%;
-        }
-
-        /* Sign In button */
         .btn-signin {
             width: 100%;
             padding: 1.1rem;
@@ -522,29 +413,17 @@
             border: none;
             border-radius: 12px;
             color: var(--uc-navy-dark);
-            font-family: 'Inter', sans-serif;
             font-size: 0.96rem;
             font-weight: 700;
             letter-spacing: 0.06em;
             text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             box-shadow: 0 10px 30px rgba(255, 184, 28, 0.3);
-            position: relative;
-            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.7rem;
-        }
-
-        .btn-signin::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
         }
 
         .btn-signin:hover {
@@ -552,22 +431,6 @@
             box-shadow: 0 15px 40px rgba(255, 184, 28, 0.4);
         }
 
-        .btn-signin:hover::before {
-            opacity: 1;
-        }
-
-        .btn-signin:active {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(255, 184, 28, 0.3);
-        }
-
-        .btn-signin:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Signup prompt */
         .signup-prompt {
             text-align: center;
             margin-top: 1.8rem;
@@ -579,60 +442,27 @@
             color: var(--uc-gold);
             text-decoration: none;
             font-weight: 700;
-            transition: all 0.3s ease;
-            position: relative;
         }
 
-        .signup-prompt a:hover {
-            color: var(--uc-gold-light);
-        }
-
-        /* Alerts */
         .alert {
             border-radius: 10px;
             padding: 1rem 1.2rem;
             margin-bottom: 1.5rem;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.9rem;
             font-size: 0.87rem;
-            line-height: 1.6;
-            animation: slideDown 0.4s ease-out;
-            backdrop-filter: blur(4px);
-        }
-
-        @@keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-15px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .alert-icon {
-            font-size: 1.1rem;
-            flex-shrink: 0;
-            margin-top: 0.1rem;
         }
 
         .alert-success {
             background: rgba(76, 222, 128, 0.12);
             border: 1px solid rgba(76, 222, 128, 0.35);
             color: oklch(84% 0.14 154);
-            box-shadow: 0 0 20px rgba(76, 222, 128, 0.1);
         }
 
         .alert-danger {
             background: rgba(248, 113, 113, 0.12);
             border: 1px solid rgba(248, 113, 113, 0.35);
             color: oklch(78% 0.12 25);
-            box-shadow: 0 0 20px rgba(248, 113, 113, 0.1);
         }
 
-        /* Footer links */
         .form-footer {
             display: flex;
             justify-content: center;
@@ -645,101 +475,16 @@
         .form-footer a {
             color: oklch(72% 0.01 250);
             text-decoration: none;
-            transition: all 0.3s ease;
-            font-weight: 500;
         }
 
-        .form-footer a:hover {
-            color: var(--uc-gold);
-        }
-
-        .form-footer span {
-            opacity: 0.4;
-        }
-
-        /* ════════════════════════════════════════════════════════════ */
-        /* RESPONSIVE — All screen sizes                                */
-        /* ════════════════════════════════════════════════════════════ */
-
-        /* Large desktops / wide monitors (≥1600px) */
-        @@media (min-width: 1600px) {
-            .hero-content h1 { font-size: 4rem; }
-            .hero-content p  { font-size: 1.15rem; }
-            .form-panel      { width: 480px; }
-            .form-card       { max-width: 420px; padding: 3rem; }
-        }
-
-        /* Standard desktops (1200px – 1599px) */
-        @@media (max-width: 1200px) {
-            .hero-panel { padding: 2.5rem; }
-            .hero-content h1 { font-size: clamp(2rem, 4.5vw, 3rem); }
-            .form-panel { width: clamp(320px, 38vw, 420px); }
-            .form-card  { max-width: 100%; }
-        }
-
-        /* Tablets / small laptops (≤1024px) — hide hero, centre form */
         @@media (max-width: 1024px) {
-            .hero-panel  { display: none; }
+            .hero-panel { display: none; }
             .auth-container { justify-content: center; }
-            .form-panel {
-                width: 100%;
-                min-width: unset;
-                padding: 2rem 1.5rem;
-            }
-            .form-card {
-                max-width: min(440px, 94vw);
-                margin: auto;
-            }
+            .form-panel { width: 100%; }
         }
 
-        /* Portrait tablets / large phones (≤768px) */
         @@media (max-width: 768px) {
-            .form-panel { padding: 1.5rem 1rem; }
-            .form-card  { padding: 1.75rem 1.5rem; border-radius: 16px; }
-            .form-title { font-size: 1.7rem; }
-            .meta-row   { flex-direction: column; gap: 0.9rem; align-items: flex-start; }
-        }
-
-        /* Phones (≤480px) */
-        @@media (max-width: 480px) {
-            .form-panel  { padding: 1rem 0.75rem; }
-            .form-card   { padding: 1.5rem 1.25rem; border-radius: 14px; }
-            .form-title  { font-size: 1.5rem; }
-            .form-badge  { font-size: 0.68rem; padding: 0.4rem 0.9rem; }
-            .form-subtitle { font-size: 0.86rem; }
-            .btn-signin  { font-size: 0.9rem; padding: 0.9rem; }
-            .form-group  { margin-bottom: 1.2rem; }
-            .form-group input { padding: 0.85rem 1rem 0.85rem 2.8rem; font-size: 0.9rem; }
-            .form-label  { font-size: 0.7rem; }
-            .signup-prompt { font-size: 0.85rem; }
-        }
-
-        /* Small phones (≤360px) */
-        @@media (max-width: 360px) {
-            .form-panel  { padding: 0.75rem; }
-            .form-card   { padding: 1.25rem 1rem; border-radius: 12px; }
-            .form-title  { font-size: 1.35rem; }
-            .form-badge  { font-size: 0.63rem; padding: 0.35rem 0.8rem; }
-            .btn-signin  { font-size: 0.85rem; padding: 0.8rem; }
-        }
-
-        /* Very short screens (landscape phones) */
-        @@media (max-height: 600px) {
-            .form-header { margin-bottom: 1.2rem; }
-            .form-group  { margin-bottom: 1rem; }
-            .meta-row    { margin-bottom: 1rem; }
-            .form-group input { padding: 0.75rem 1rem 0.75rem 2.8rem; }
-        }
-
-        /* Scrollbar styling */
-        .form-panel::-webkit-scrollbar { width: 6px; }
-        .form-panel::-webkit-scrollbar-track { background: transparent; }
-        .form-panel::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, rgba(255,184,28,0.35) 0%, rgba(255,184,28,0.15) 100%);
-            border-radius: 4px;
-        }
-        .form-panel::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,184,28,0.5);
+            .meta-row { flex-direction: column; gap: 0.9rem; align-items: flex-start; }
         }
     </style>
 </head>
@@ -759,14 +504,6 @@
                 <div>
                     <h1>Empower Your<span class="highlight">Academic</span>Journey</h1>
                     <p>Access the University of Cebu – College of Computer Studies portal to manage courses, track progress, and connect with your academic community.</p>
-                    <div class="hero-accent">
-                        <div class="accent-line"></div>
-                        <div class="accent-dots">
-                            <div class="dot active"></div>
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -787,7 +524,6 @@
                 @if (TempData["Success"] != null)
                 {
                     <div class="alert alert-success">
-                        <span class="alert-icon">✓</span>
                         <span>@TempData["Success"]</span>
                     </div>
                 }
@@ -795,7 +531,6 @@
                 @if (ViewBag.Error != null)
                 {
                     <div class="alert alert-danger">
-                        <span class="alert-icon">⚠</span>
                         <span>@ViewBag.Error</span>
                     </div>
                 }
@@ -803,7 +538,6 @@
                 <form asp-action="Login" method="post">
                     @Html.AntiForgeryToken()
 
-                    <!-- Student ID -->
                     <div class="form-group">
                         <label class="form-label">Student ID Number</label>
                         <div class="input-wrapper">
@@ -813,7 +547,6 @@
                         <span asp-validation-for="IdNumber" style="display:block; margin-top:0.4rem; color: oklch(78% 0.12 25); font-size: 0.75rem;"></span>
                     </div>
 
-                    <!-- Password -->
                     <div class="form-group">
                         <label class="form-label">Password</label>
                         <div class="input-wrapper">
@@ -823,7 +556,6 @@
                         <span asp-validation-for="Password" style="display:block; margin-top:0.4rem; color: oklch(78% 0.12 25); font-size: 0.75rem;"></span>
                     </div>
 
-                    <!-- Meta row -->
                     <div class="meta-row">
                         <label class="remember-me">
                             <input type="checkbox" asp-for="RememberMe" />
@@ -832,19 +564,15 @@
                         <a href="#" class="forgot-password">Forgot password?</a>
                     </div>
 
-                    <!-- Sign In Button -->
                     <button type="submit" class="btn-signin">
-                        <span>🔐</span>
                         <span>Sign In</span>
                     </button>
                 </form>
 
-                <!-- Signup Prompt -->
                 <div class="signup-prompt">
                     Don't have an account? <a href="/Student/Register">Request Access</a>
                 </div>
 
-                <!-- Footer -->
                 <div class="form-footer">
                     <a href="#">Help</a>
                     <span>·</span>
@@ -855,32 +583,5 @@
             </div>
         </div>
     </div>
-
-    <!-- Zoom Prevention Script -->
-    <script>
-        // Disable pinch zoom on touch devices
-        document.addEventListener('touchmove', function(e) {
-            if (e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        // Disable keyboard zoom shortcuts (Ctrl/Cmd + +/-)
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '0')) {
-                e.preventDefault();
-            }
-        });
-
-        // Disable double-tap zoom
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function(e) {
-            const now = Date.now();
-            if (now - lastTouchEnd <= 300) {
-                e.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-    </script>
 </body>
-</html></html>
+</html>

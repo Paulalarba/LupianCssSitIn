@@ -52,7 +52,7 @@
         url("https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?w=1800&auto=format&fit=crop&q=82");
       background-position: center;
       background-size: cover;
-      overflow-x: hidden;
+      background-attachment: fixed;
     }
 
     a {
@@ -67,9 +67,9 @@
     }
 
     .register-shell {
-      min-height: 100svh;
+      min-height: 100vh;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(380px, 520px);
+      grid-template-columns: minmax(0, 1fr) minmax(min(100%, 360px), 520px);
       gap: clamp(1.5rem, 4vw, 4rem);
       align-items: stretch;
       padding: clamp(1rem, 2.4vw, 2.5rem);
@@ -146,8 +146,13 @@
 
     .intro-copy {
       max-width: 650px;
-      align-self: end;
-      padding-bottom: clamp(1.5rem, 5vh, 4rem);
+      align-self: center;
+      justify-self: center;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 0;
     }
 
     .eyebrow {
